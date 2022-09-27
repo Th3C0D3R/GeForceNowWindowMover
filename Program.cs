@@ -27,20 +27,6 @@ namespace GeForceNowWindowMover
         static void Main(string[] args)
         {
 
-            if (Settings.Default.firstRun)
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
-                FrmMessure form = new FrmMessure();
-
-                DialogResult dlgRes = form.ShowDialog();
-
-                if (dlgRes != DialogResult.OK) return;
-                Settings.Default.firstRun = false;
-                Settings.Default.Save();
-            }
-
             Process proc = null;
             while (proc == null)
             {
@@ -52,6 +38,23 @@ namespace GeForceNowWindowMover
         private static Process ChooseProcess()
         {
             Console.Clear();
+            if (Settings.Default.firstRun)
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                FrmMessure form = new FrmMessure();
+
+                DialogResult dlgRes = form.ShowDialog();
+
+                if (dlgRes != DialogResult.OK)
+                {
+                    Application.Exit();
+                    return null;
+                }
+                Settings.Default.firstRun = false;
+                Settings.Default.Save();
+            }
             Console.WriteLine("\nIf you want to resize the window, enter '-1' into the process choose menu later!!\n");
             Process[] processes = Process.GetProcessesByName("GeForceNOW");
             while (processes.Length == 0)
@@ -96,6 +99,7 @@ namespace GeForceNowWindowMover
             GetWindowRect(proc.MainWindowHandle, out rect);
             SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, Settings.Default.X, Settings.Default.Y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
             MoveWindow(proc.MainWindowHandle, Settings.Default.X, Settings.Default.Y, Settings.Default.Width, Settings.Default.Height, true);
+            MessageBox.Show($"{proc.MainWindowTitle} successfull modified\nProgram shuting down", "Successfull modified");
         }
     }
 }
