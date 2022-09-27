@@ -1,4 +1,6 @@
 # GeForceNow WindowMover
+[![Build status](https://ci.appveyor.com/api/projects/status/rlok08jsyvfrs4or/branch/main?svg=true)](https://ci.appveyor.com/project/Th3C0D3R/geforcenowwindowmover/branch/main)
+
 This Application exists because I could not find a working programm to resize/move the game window which 
 GeForce NOW shows when inside a game.
 
