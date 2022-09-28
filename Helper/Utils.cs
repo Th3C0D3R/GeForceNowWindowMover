@@ -34,7 +34,7 @@ namespace GeForceNowWindowMover.Helper
 
         public static Process ChooseProcess()
         {
-            Process[] processes = Process.GetProcessesByName("notepad++");
+            Process[] processes = Process.GetProcessesByName("GeForceNOW");
             while (processes.Length == 0)
             {
                 Console.WriteLine("No GeForceNOW process found!\nPlease start the game first\nThen press any key in console to continue!");
