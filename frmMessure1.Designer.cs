@@ -36,8 +36,7 @@ namespace GeForceNowWindowMover {
         /// Initalisiert ein frmMessure-Objekt.
         /// </summary>
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public frmMessure() {
-        }
+
         
         /// <summary>
         /// Thread safe lock Objekt, die von dieser Klasse verwendet wird.
