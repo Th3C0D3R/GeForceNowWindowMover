@@ -12,19 +12,19 @@ build:
   project: GeForceNowWindowMover.csproj
   verbosity: normal
 after_build:
-- cmd: 7z a GeForceNow_WindowMover.zip %APPVEYOR_BUILD_FOLDER%\Release\*.exe %APPVEYOR_BUILD_FOLDER%\Release\*.exe.config
+- cmd: 7z a GFN_WindowMover.zip %APPVEYOR_BUILD_FOLDER%\Release\*.exe %APPVEYOR_BUILD_FOLDER%\Release\*.exe.config
 artifacts:
-- path: GeForceNow_WindowMover.zip
+- path: GFN_WindowMover.zip
   name: deploy
 deploy:
 - provider: GitHub
   tag: v$(appveyor_build_version)
-  release: GeforceNowWindowMover-v$(appveyor_build_version)
+  release: GFNWindowMover-v$(appveyor_build_version)
   auth_token:
     secure: Jib02JvY9eExnO/sKNidWw8d5URXJ2xl7jY1iJXYqVWlAwwaBMHkNA+mHslpIjjJ
   artifact: deploy
   draft: false
-  prerelease: true
+  prerelease: false
   force_update: true
   on:
     branch: main
@@ -34,3 +34,4 @@ skip_commits:
   - LICENSE
   - '.gitignore'
   - 'App.config'
+  - 'appveyor.yml'
