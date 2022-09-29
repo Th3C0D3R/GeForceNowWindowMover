@@ -1,25 +1,35 @@
-﻿using GeForceNowWindowMover.Properties;
+﻿using GeForceNowWindowMover.Helper;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GeForceNowWindowMover
 {
-    public partial class FrmMessure : Form
+    public partial class frmWrapper : Form
     {
-        public FrmMessure()
+        private Process proc = null;
+        public frmWrapper(Process p)
         {
             InitializeComponent();
+            proc = p;
+            Utils.Resize(proc, this);
+            Utils.StateChange(proc, this, FormWindowState.Normal);
+            this.Text = $"{proc.MainWindowTitle} (WRAPPED)";
+            Rectangle testWinSize = Utils.GetWindowSize(proc);
+            if (testWinSize.Width > (this.Width - Utils.offsetWidth) || testWinSize.Height > (this.Height - Utils.offsetHeight))
+            {
+                this.Height = testWinSize.Height + Utils.offsetHeight + Utils.offsetHeight;
+                this.Width = testWinSize.Width + Utils.offsetWidth + Utils.offsetWidth;
+                Utils.Resize(proc, this);
+            }
         }
+
+
+        #region WndProc
         protected override void WndProc(ref Message m)
         {
-            const int RESIZE_HANDLE_SIZE = 10;
+            const int RESIZE_HANDLE_SIZE = 5;
             switch (m.Msg)
             {
                 case 0x0084/*NCHITTEST*/ :
@@ -70,15 +80,31 @@ namespace GeForceNowWindowMover
                 return cp;
             }
         }
+        #endregion
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void frmWrapper_Move(object sender, EventArgs e)
         {
-            Settings.Default.X = this.Location.X;
-            Settings.Default.Y = this.Location.Y;
-            Settings.Default.Width = this.Width;
-            Settings.Default.Height = this.Height;
-            Settings.Default.Save();
-            this.DialogResult = DialogResult.OK;
+            Utils.Resize(proc, this);
+        }
+        private void frmWrapper_SizeChanged(object sender, EventArgs e)
+        {
+            Utils.Resize(proc, this);
+        }
+        private void frmWrapper_StyleChanged(object sender, EventArgs e)
+        {
+            Utils.StateChange(proc, this, this.WindowState);
+        }
+
+        private void frmWrapper_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            DialogResult dlres = MessageBox.Show("Do you want to exit the wrapped process too?", "Exit Process", MessageBoxButtons.YesNo);
+            if(dlres == DialogResult.Yes)
+            {
+                if (proc != null)
+                {
+                    proc.Kill();
+                }
+            }
         }
     }
 }

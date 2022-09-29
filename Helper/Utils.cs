@@ -19,18 +19,18 @@ namespace GeForceNowWindowMover.Helper
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         [DllImport("user32.dll")]
-        private static extern int GetWindowRect(IntPtr hwnd, out Rectangle rect); 
-        [DllImport("USER32.DLL")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        private static extern int GetWindowRect(IntPtr hwnd, out Rectangle rect);
+
 
         const uint SWP_NOSIZE = 0x0001;
         const uint SWP_NOZORDER = 0x0004;
         const uint SWP_SHOWWINDOW = 0x0040;
         const uint SWP_HIDEWINDOW = 0x0080;
-        const float offsetX = 5f;
-        const int offsetY = 30;
-        const int offsetWidth = (int)(2 * offsetX) + 3;
-        const int offsetHeight = (int)(offsetX +offsetY) + 2;
+
+        public const float offsetX = 15f;
+        public const int offsetY = 40;
+        public const int offsetWidth = (int)(2 * offsetX) + 5;
+        public const int offsetHeight = (int)(offsetX + offsetY) + 2;
 
         public static Process ChooseProcess()
         {
@@ -39,13 +39,13 @@ namespace GeForceNowWindowMover.Helper
             {
                 Console.WriteLine("No GeForceNOW process found!\nPlease start the game first\nThen press any key in console to continue!");
                 Console.ReadKey();
-                processes = Process.GetProcessesByName("notepad++");
+                processes = Process.GetProcessesByName("GeForceNOW");
             }
             Console.WriteLine("Choose the Process matching the Window-Title (usually '*Gamename* at GeForce NOW')");
             for (int i = 0; i < processes.Length; i++)
             {
                 if (processes[i].MainWindowTitle.Length <= 0) continue;
-                Console.WriteLine($"{i+1}) {processes[i].MainWindowTitle}");
+                Console.WriteLine($"{i + 1}) {processes[i].MainWindowTitle}");
             }
             Console.Write("\r\nSelect a process: ");
             var input = Console.ReadLine();
@@ -60,7 +60,7 @@ namespace GeForceNowWindowMover.Helper
                         Settings.Default.Save();
                         ChooseProcess();
                     }
-                    return processes[num-1];
+                    return processes[num - 1];
                 }
                 else return ChooseProcess();
             }
@@ -68,9 +68,6 @@ namespace GeForceNowWindowMover.Helper
 
         public static void callResizeForm()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
             FrmMessure form = new FrmMessure();
 
             DialogResult dlgRes = form.ShowDialog();
@@ -85,24 +82,14 @@ namespace GeForceNowWindowMover.Helper
 
         public static void Resize(Process proc, frmWrapper frm = null)
         {
-            if(frm != null)
+            if (frm != null)
             {
-                SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
                 MoveWindow(proc.MainWindowHandle, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, frm.Width - offsetWidth, frm.Height - offsetHeight, true);
             }
             else
             {
-                SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, Settings.Default.X, Settings.Default.Y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
                 MoveWindow(proc.MainWindowHandle, Settings.Default.X, Settings.Default.Y, Settings.Default.Width, Settings.Default.Height, true);
                 MessageBox.Show($"{proc.MainWindowTitle} successfull modified\nProgram shuting down", "Successfull modified");
-            }
-        }
-        public static void RePosition(Process proc, frmWrapper frm)
-        {
-            if(frm != null)
-            {
-                SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-                MoveWindow(proc.MainWindowHandle, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, frm.Width - offsetWidth, frm.Height - offsetHeight, true);
             }
         }
         public static void StateChange(Process proc, frmWrapper frm, FormWindowState state)
@@ -111,12 +98,12 @@ namespace GeForceNowWindowMover.Helper
             {
                 uint flag = state == FormWindowState.Minimized ? SWP_HIDEWINDOW : SWP_SHOWWINDOW;
                 SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | flag);
-                MoveWindow(proc.MainWindowHandle, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, frm.Width - offsetWidth, frm.Height - offsetHeight, true);
             }
         }
-        public static void BringToFront(Process proc)
+        public static Rectangle GetWindowSize(Process proc)
         {
-            SetForegroundWindow(proc.MainWindowHandle);
+            GetWindowRect(proc.MainWindowHandle, out Rectangle size);
+            return size;
         }
     }
 }

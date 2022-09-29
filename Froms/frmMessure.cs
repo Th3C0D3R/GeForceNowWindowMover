@@ -1,9 +1,8 @@
-﻿using GeForceNowWindowMover.Helper;
+﻿using GeForceNowWindowMover.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,19 +11,21 @@ using System.Windows.Forms;
 
 namespace GeForceNowWindowMover
 {
-    public partial class frmWrapper : Form
+    public partial class FrmMessure : Form
     {
-        private Process proc = null;
-        public frmWrapper(Process p)
+        public FrmMessure()
         {
             InitializeComponent();
-            proc = p;
-            Utils.RePosition(proc, this);
-            Utils.StateChange(proc, this, FormWindowState.Normal);
-            Utils.BringToFront(proc);
-            this.Text = $"{proc.MainWindowTitle} (WRAPPED)";
         }
-
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+            Settings.Default.X = this.Location.X;
+            Settings.Default.Y = this.Location.Y;
+            Settings.Default.Width = this.Width;
+            Settings.Default.Height = this.Height;
+            Settings.Default.Save();
+            this.DialogResult = DialogResult.OK;
+        }
 
         #region WndProc
         protected override void WndProc(ref Message m)
@@ -81,30 +82,5 @@ namespace GeForceNowWindowMover
             }
         }
         #endregion
-
-        private void frmWrapper_Move(object sender, EventArgs e)
-        {
-            Utils.RePosition(proc, this);
-        }
-        private void frmWrapper_SizeChanged(object sender, EventArgs e)
-        {
-            Utils.Resize(proc, this);
-        }
-        private void frmWrapper_StyleChanged(object sender, EventArgs e)
-        {
-            Utils.StateChange(proc, this, this.WindowState);
-        }
-
-        private void frmWrapper_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            DialogResult dlres = MessageBox.Show("Do you want to exit the wrapped process too?", "Exit Process", MessageBoxButtons.YesNo);
-            if(dlres == DialogResult.Yes)
-            {
-                if (proc != null)
-                {
-                    proc.Kill();
-                }
-            }
-        }
     }
 }
