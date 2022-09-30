@@ -18,3 +18,9 @@ GeForce NOW shows when inside a game.
 
 ## Compile your own
 Just clone the repo and compile, it should work out of the box (I compiled it with Visual Studio 2022 and .NET 4.8)
+
+## Screenshots
+![Console Option](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/images/Start.png)
+![Wrapped Form](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/images/WrappedForm.png)
+![Fixed Size Start](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/images/FixedSize_Start.png)
+![Fixed Size End](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/images/FixedSize_End.png)
