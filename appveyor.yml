@@ -32,6 +32,7 @@ deploy:
 skip_commits:
   files:
   - '*.md'
+  - '*.png'
   - LICENSE
   - '.gitignore'
   - 'App.config'
