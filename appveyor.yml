@@ -20,6 +20,7 @@ deploy:
 - provider: GitHub
   tag: v$(appveyor_build_version)
   release: GFNWindowMover-v$(appveyor_build_version)
+  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)$(APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)
   auth_token:
     secure: Jib02JvY9eExnO/sKNidWw8d5URXJ2xl7jY1iJXYqVWlAwwaBMHkNA+mHslpIjjJ
   artifact: deploy
