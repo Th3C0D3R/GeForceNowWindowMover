@@ -45,10 +45,10 @@
             this.BackColor = System.Drawing.Color.Silver;
             this.Controls.Add(this.pnlInner);
             this.Name = "frmWrapper";
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.TopMost = true;
             this.TransparencyKey = System.Drawing.Color.White;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmWrapper_FormClosing);
+            this.Load += new System.EventHandler(this.frmWrapper_Load);
             this.SizeChanged += new System.EventHandler(this.frmWrapper_SizeChanged);
             this.Move += new System.EventHandler(this.frmWrapper_Move);
             this.StyleChanged += new System.EventHandler(this.frmWrapper_StyleChanged);

@@ -14,23 +14,35 @@ namespace GeForceNowWindowMover.Helper
 
     public static class Utils
     {
+        #region DllImport
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         [DllImport("user32.dll")]
         private static extern int GetWindowRect(IntPtr hwnd, out Rectangle rect);
+        [DllImport("Kernel32.dll", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        private static extern IntPtr GetConsoleWindow();
+        [DllImport("User32.dll", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ShowWindow([In] IntPtr hWnd, [In] Int32 nCmdShow);
+        #endregion
 
-
-        const uint SWP_NOSIZE = 0x0001;
+        #region Constants
         const uint SWP_NOZORDER = 0x0004;
         const uint SWP_SHOWWINDOW = 0x0040;
         const uint SWP_HIDEWINDOW = 0x0080;
+        const int SW_MINIMIZE = 6;
+        const int SW_HIDE = 0;
+        #endregion
 
-        public const float offsetX = 15f;
-        public const int offsetY = 40;
-        public const int offsetWidth = (int)(2 * offsetX) + 5;
-        public const int offsetHeight = (int)(offsetX + offsetY) + 2;
+        #region Properties Calculation Size/Position
+        public static int OffsetX { get; set; } = 38;
+        public static int OffsetY { get; set; } = 16;
+        public static int InnerWidth { get; set; } = 32;
+        public static int InnerHeight { get; set; } = 54;
+        public static int SpaceBorder { get; set; } = 15;
+        #endregion
 
         public static Process ChooseProcess()
         {
@@ -65,7 +77,6 @@ namespace GeForceNowWindowMover.Helper
                 else return ChooseProcess();
             }
         }
-
         public static void callResizeForm()
         {
             FrmMessure form = new FrmMessure();
@@ -79,12 +90,15 @@ namespace GeForceNowWindowMover.Helper
             Settings.Default.firstRun = false;
             Settings.Default.Save();
         }
-
         public static void Resize(Process proc, frmWrapper frm = null)
         {
             if (frm != null)
             {
-                MoveWindow(proc.MainWindowHandle, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, frm.Width - offsetWidth, frm.Height - offsetHeight, true);
+                OffsetX = frm.ClientRectangle.Width - frm.pnlInner.Width;
+                OffsetY = frm.ClientRectangle.Height - frm.pnlInner.Height;
+                InnerWidth = frm.pnlInner.Width + SpaceBorder;
+                InnerHeight = frm.pnlInner.Height + SpaceBorder - 6;
+                MoveWindow(proc.MainWindowHandle, frm.Location.X + (OffsetX/2), frm.Location.Y + (OffsetY + SpaceBorder), InnerWidth, InnerHeight, true);
             }
             else
             {
@@ -97,13 +111,21 @@ namespace GeForceNowWindowMover.Helper
             if (frm != null)
             {
                 uint flag = state == FormWindowState.Minimized ? SWP_HIDEWINDOW : SWP_SHOWWINDOW;
-                SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + (int)offsetX, frm.Location.Y + offsetY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | flag);
+                SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + OffsetX / 2, frm.Location.Y + OffsetY, InnerWidth, InnerHeight, SWP_NOZORDER | flag);
             }
         }
         public static Rectangle GetWindowSize(Process proc)
         {
             GetWindowRect(proc.MainWindowHandle, out Rectangle size);
             return size;
+        }
+        public static void MinimizeConsole()
+        {
+            IntPtr hWndConsole = GetConsoleWindow();
+            if(hWndConsole != IntPtr.Zero)
+            {
+                ShowWindow(hWndConsole, SW_HIDE);
+            }
         }
     }
 }

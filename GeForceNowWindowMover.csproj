@@ -100,6 +100,11 @@
     <Compile Include="Froms\frmSelectProcess.Designer.cs">
       <DependentUpon>frmSelectProcess.cs</DependentUpon>
     </Compile>
+    <Compile Include="Froms\WrapperForm1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WrapperForm.resx</DependentUpon>
+    </Compile>
     <Compile Include="Helper\Utils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

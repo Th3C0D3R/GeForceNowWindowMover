@@ -23,6 +23,8 @@ namespace GeForceNowWindowMover
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Console.SetWindowSize(113, 19);
+            Console.SetBufferSize(113, 3000);
             Menu();
         }
 
@@ -64,6 +66,7 @@ namespace GeForceNowWindowMover
 
         private static void RunWrapper(Process proc)
         {
+            Utils.MinimizeConsole();
             frmWrapper frmWrapper = new frmWrapper(proc);
             frmWrapper.ShowDialog();
         }
