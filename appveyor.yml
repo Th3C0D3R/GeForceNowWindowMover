@@ -22,7 +22,7 @@ deploy:
   release: GFNWindowMover-v$(appveyor_build_version)
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)\n$(APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)
   auth_token:
-    secure: Jib02JvY9eExnO/sKNidWw8d5URXJ2xl7jY1iJXYqVWlAwwaBMHkNA+mHslpIjjJ
+    secure: sk/FtVXDOUNUDwskevXe2FV8XKYzOmYCS5uML4ElDyNnzZV+hNdmGfD3GgElog5WuZF2mCB8Afs2bI4fyfjxSz6kAgzCXQzG5tep1zuo0nE=
   artifact: deploy
   draft: false
   prerelease: false
