@@ -44,6 +44,20 @@ namespace GeForceNowWindowMover.Helper
         public static int SpaceBorder { get; set; } = 15;
         #endregion
 
+
+        public static Process GetProcessByName(string name)
+        {
+            var processList = Process.GetProcesses();
+            foreach (var process in processList)
+            {
+                if (process.MainWindowTitle.Length <= 0) continue;
+                if(process.ProcessName == name)
+                {
+                    return process;
+                }
+            }
+            return null;
+        }
         public static Process ChooseProcess()
         {
             Process[] processes = Process.GetProcessesByName("GeForceNOW");
@@ -103,7 +117,6 @@ namespace GeForceNowWindowMover.Helper
             else
             {
                 MoveWindow(proc.MainWindowHandle, Settings.Default.X, Settings.Default.Y, Settings.Default.Width, Settings.Default.Height, true);
-                MessageBox.Show($"{proc.MainWindowTitle} successfull modified\nProgram shuting down", "Successfull modified");
             }
         }
         public static void StateChange(Process proc, frmWrapper frm, FormWindowState state)
