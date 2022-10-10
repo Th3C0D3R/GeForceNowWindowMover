@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -127,11 +129,6 @@ namespace GeForceNowWindowMover.Helper
                 SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + OffsetX / 2, frm.Location.Y + OffsetY, InnerWidth, InnerHeight, SWP_NOZORDER | flag);
             }
         }
-        public static Rectangle GetWindowSize(Process proc)
-        {
-            GetWindowRect(proc.MainWindowHandle, out Rectangle size);
-            return size;
-        }
         public static void MinimizeConsole()
         {
             IntPtr hWndConsole = GetConsoleWindow();
@@ -139,6 +136,17 @@ namespace GeForceNowWindowMover.Helper
             {
                 ShowWindow(hWndConsole, SW_HIDE);
             }
+        }
+        public static void PrintConsoleHelp()
+        {
+            Console.WriteLine($"");
+            Console.WriteLine($"Usage: {Path.GetFileName(Assembly.GetEntryAssembly().Location)} [[--process=|-p=] --nofixed|-nf]");
+            Console.WriteLine($"");
+            Console.WriteLine($"If a process name is set with the -(-p)rocess option, the -nofixed is not necessary");
+            Console.WriteLine($"If --nofixed (or -nf) is set, the -(-p)rocess option is necessary!");
+            Console.WriteLine($"");
+            Console.WriteLine($"PROCESSNAME WITHOUT .EXE/EXTENSION (e.g: GeForceNOW instead of GeForceNOW.exe");
+            Console.WriteLine($"");
         }
     }
 }
