@@ -127,11 +127,6 @@ namespace GeForceNowWindowMover.Helper
                 SetWindowPos(proc.MainWindowHandle, IntPtr.Zero, frm.Location.X + OffsetX / 2, frm.Location.Y + OffsetY, InnerWidth, InnerHeight, SWP_NOZORDER | flag);
             }
         }
-        public static Rectangle GetWindowSize(Process proc)
-        {
-            GetWindowRect(proc.MainWindowHandle, out Rectangle size);
-            return size;
-        }
         public static void MinimizeConsole()
         {
             IntPtr hWndConsole = GetConsoleWindow();

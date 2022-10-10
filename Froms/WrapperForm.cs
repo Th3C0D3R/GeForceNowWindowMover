@@ -17,19 +17,10 @@ namespace GeForceNowWindowMover
             this.Text = $"{proc.MainWindowTitle} (WRAPPED)";
         }
 
-        private void frmWrapper_Move(object sender, EventArgs e)
-        {
-            Utils.Resize(this.proc, this);
-        }
-        private void frmWrapper_SizeChanged(object sender, EventArgs e)
-        {
-            Utils.Resize(this.proc, this);
-        }
-        private void frmWrapper_StyleChanged(object sender, EventArgs e)
-        {
-            Utils.StateChange(this.proc, this, this.WindowState);
-        }
-
+        private void frmWrapper_Move(object sender, EventArgs e) => Utils.Resize(this.proc, this);
+        private void frmWrapper_SizeChanged(object sender, EventArgs e) => Utils.Resize(this.proc, this);
+        private void frmWrapper_StyleChanged(object sender, EventArgs e) => Utils.StateChange(this.proc, this, this.WindowState);
+        private void frmWrapper_Load(object sender, EventArgs e) => Utils.Resize(this.proc, this);
         private void frmWrapper_FormClosing(object sender, FormClosingEventArgs e)
         {
             DialogResult dlres = MessageBox.Show("Do you want to exit the wrapped process too?", "Exit Process", MessageBoxButtons.YesNo);
@@ -40,11 +31,6 @@ namespace GeForceNowWindowMover
                     this.proc.Kill();
                 }
             }
-        }
-
-        private void frmWrapper_Load(object sender, EventArgs e)
-        {
-            Utils.Resize(this.proc, this);
         }
     }
 }

@@ -45,6 +45,11 @@ namespace GeForceNowWindowMover
                         }
                     }
                 }
+                if(processName == String.Empty)
+                {
+                    MessageBox.Show($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Process found");
+                    return;
+                }
                 Process proc = Utils.GetProcessByName(processName);
                 if (proc != null)
                 {
@@ -60,6 +65,7 @@ namespace GeForceNowWindowMover
                 else
                 {
                     MessageBox.Show($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Process found");
+                    return;
                 }
             }
             else
