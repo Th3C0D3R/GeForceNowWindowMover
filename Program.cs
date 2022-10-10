@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,10 +46,17 @@ namespace GeForceNowWindowMover
                             processName = arg[1];
                         }
                     }
+                    else if (arg[0] == "help" || arg[0] == "h")
+                    {
+                        Utils.PrintConsoleHelp();
+                        Console.ReadKey();
+                        return;
+                    }
                 }
                 if(processName == String.Empty)
                 {
-                    MessageBox.Show($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Process found");
+                    Console.WriteLine($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Processname set");
+                    Utils.PrintConsoleHelp();
                     return;
                 }
                 Process proc = Utils.GetProcessByName(processName);
@@ -64,7 +73,8 @@ namespace GeForceNowWindowMover
                 }
                 else
                 {
-                    MessageBox.Show($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Process found");
+                    Console.WriteLine($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Process found");
+                    Utils.PrintConsoleHelp();
                     return;
                 }
             }
