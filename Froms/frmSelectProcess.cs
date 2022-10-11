@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GeForceNowWindowMover.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -61,6 +62,8 @@ namespace GeForceNowWindowMover.Froms
         private void btnSelect_Click(object sender, EventArgs e)
         {
             selProc = selProcPrivat;
+            Settings.Default.lastProcess = selProc.ProcessName;
+            Settings.Default.Save();
         }
         private void btnRefresh_Click(object sender, EventArgs e)
         {

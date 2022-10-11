@@ -20,6 +20,7 @@ namespace GeForceNowWindowMover
     {
         private static bool nofixedWindow = true;
         private static string processName = String.Empty;
+        private static Process lastProcess = null;
 
         [STAThread]
         static void Main(string[] args)
@@ -28,6 +29,10 @@ namespace GeForceNowWindowMover
             Application.SetCompatibleTextRenderingDefault(false);
             Console.SetWindowSize(113, 19);
             Console.SetBufferSize(113, 3000);
+            if(Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
+            {
+                lastProcess = Utils.GetProcessByName(Settings.Default.lastProcess);
+            }
             if (args.Length > 0)
             {
                 for (int i = 0; i < args.Length; i++)
@@ -53,27 +58,30 @@ namespace GeForceNowWindowMover
                         return;
                     }
                 }
-                if(processName == String.Empty)
+                if(processName == String.Empty && lastProcess == null)
                 {
                     Console.WriteLine($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Processname set");
                     Utils.PrintConsoleHelp();
                     return;
                 }
-                Process proc = Utils.GetProcessByName(processName);
-                if (proc != null)
+                else if(processName != String.Empty)
+                {
+                    lastProcess = Utils.GetProcessByName(processName);
+                }
+                if (lastProcess != null)
                 {
                     if (nofixedWindow)
                     {
-                        RunWrapper(proc);
+                        RunWrapper(lastProcess);
                     }
                     else
                     {
-                        RunFixed(proc);
+                        RunFixed(lastProcess);
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Process found");
+                    Console.WriteLine($"No Process with the name {processName} or {Settings.Default.lastProcess} found!\nPlease make sure the process already started", "No Process found");
                     Utils.PrintConsoleHelp();
                     return;
                 }
@@ -98,15 +106,25 @@ namespace GeForceNowWindowMover
             if (option == 1)
             {
                 Process proc = null;
-                frmSelectProcess selectProcess = new frmSelectProcess();
-                DialogResult dialog = selectProcess.ShowDialog();
-                if (dialog != DialogResult.OK) Menu();
-                proc = selectProcess.selProc;
+                if(Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
+                {
+                    proc = Utils.GetProcessByName(Settings.Default.lastProcess);
+                }
+                else
+                {
+                    frmSelectProcess selectProcess = new frmSelectProcess();
+                    DialogResult dialog = selectProcess.ShowDialog();
+                    if (dialog != DialogResult.OK) Menu();
+                    proc = selectProcess.selProc;
+                }
                 RunWrapper(proc);
             }
             else if (option == 2)
             {
-                RunFixed();
+                if (!RunFixed())
+                {
+                    Menu();
+                }
             }
             else if (option == -1)
             {
@@ -127,19 +145,31 @@ namespace GeForceNowWindowMover
             frmWrapper.ShowDialog();
         }
 
-        private static void RunFixed(Process proc = null)
+        private static bool RunFixed(Process proc = null)
         {
             if (proc == null)
             {
-                frmSelectProcess selectProcess = new frmSelectProcess();
-                selectProcess.ShowDialog();
-                proc = selectProcess.selProc;
+                if(Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
+                {
+                    proc = Utils.GetProcessByName(Settings.Default.lastProcess);
+                }
+                else
+                {
+                    frmSelectProcess selectProcess = new frmSelectProcess();
+                    DialogResult dialog = selectProcess.ShowDialog();
+                    if (dialog != DialogResult.OK)
+                    {
+                        return false;
+                    }
+                    proc = selectProcess.selProc;
+                }
             }
             while (Settings.Default.firstRun)
             {
                 Utils.callResizeForm();
             }
             Utils.Resize(proc);
+            return true;
         }
     }
 }
