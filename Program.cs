@@ -60,7 +60,9 @@ namespace GeForceNowWindowMover
                 }
                 if(processName == String.Empty && lastProcess == null)
                 {
-                    Console.WriteLine($"No Process with the name {processName} found!\nPlease make sure the process already started", "No Processname set");
+                    Settings.Default.lastProcess = String.Empty;
+                    Settings.Default.Save();
+                    Console.WriteLine($"No Process with the name {processName} found and no last process saved!\nPlease make sure the process already started", "No Processname set");
                     Utils.PrintConsoleHelp();
                     return;
                 }
@@ -81,6 +83,8 @@ namespace GeForceNowWindowMover
                 }
                 else
                 {
+                    Settings.Default.lastProcess = String.Empty;
+                    Settings.Default.Save();
                     Console.WriteLine($"No Process with the name {processName} or {Settings.Default.lastProcess} found!\nPlease make sure the process already started", "No Process found");
                     Utils.PrintConsoleHelp();
                     return;
@@ -95,6 +99,7 @@ namespace GeForceNowWindowMover
         private static void Menu()
         {
             Console.Clear();
+            Process proc = null;
             int option = -1;
             Console.WriteLine("If you want to resize the window (fixed position and size), enter '-1' into the next menu!!\n\n");
             Console.WriteLine("Please select the method to modify the game window: ");
@@ -105,26 +110,17 @@ namespace GeForceNowWindowMover
             if (!int.TryParse(input, out option)) Menu();
             if (option == 1)
             {
-                Process proc = null;
-                if(Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
+                proc = Utils.UserChooseProcess();
+                if (proc != null)
                 {
-                    proc = Utils.GetProcessByName(Settings.Default.lastProcess);
+                    RunWrapper(proc);
                 }
-                else
-                {
-                    frmSelectProcess selectProcess = new frmSelectProcess();
-                    DialogResult dialog = selectProcess.ShowDialog();
-                    if (dialog != DialogResult.OK) Menu();
-                    proc = selectProcess.selProc;
-                }
-                RunWrapper(proc);
             }
             else if (option == 2)
             {
-                if (!RunFixed())
-                {
-                    Menu();
-                }
+                proc = Utils.UserChooseProcess();
+                if (proc == null) Menu();
+                else RunFixed(proc);
             }
             else if (option == -1)
             {
@@ -145,31 +141,13 @@ namespace GeForceNowWindowMover
             frmWrapper.ShowDialog();
         }
 
-        private static bool RunFixed(Process proc = null)
+        private static void RunFixed(Process proc)
         {
-            if (proc == null)
-            {
-                if(Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
-                {
-                    proc = Utils.GetProcessByName(Settings.Default.lastProcess);
-                }
-                else
-                {
-                    frmSelectProcess selectProcess = new frmSelectProcess();
-                    DialogResult dialog = selectProcess.ShowDialog();
-                    if (dialog != DialogResult.OK)
-                    {
-                        return false;
-                    }
-                    proc = selectProcess.selProc;
-                }
-            }
             while (Settings.Default.firstRun)
             {
                 Utils.callResizeForm();
             }
             Utils.Resize(proc);
-            return true;
         }
     }
 }

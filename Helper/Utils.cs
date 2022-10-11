@@ -1,4 +1,5 @@
-﻿using GeForceNowWindowMover.Properties;
+﻿using GeForceNowWindowMover.Froms;
+using GeForceNowWindowMover.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -147,6 +148,25 @@ namespace GeForceNowWindowMover.Helper
             Console.WriteLine($"");
             Console.WriteLine($"PROCESSNAME WITHOUT .EXE/EXTENSION (e.g: GeForceNOW instead of GeForceNOW.exe");
             Console.WriteLine($"");
+        }
+        public static Process UserChooseProcess()
+        {
+            Process proc = null;
+            if (Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
+            {
+                proc = Utils.GetProcessByName(Settings.Default.lastProcess);
+            }
+            else
+            {
+                frmSelectProcess selectProcess = new frmSelectProcess();
+                DialogResult dialog = selectProcess.ShowDialog();
+                if (dialog != DialogResult.OK)
+                {
+                    return null;
+                }
+                proc = selectProcess.selProc;
+            }
+            return proc;
         }
     }
 }
