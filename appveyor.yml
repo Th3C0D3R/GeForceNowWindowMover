@@ -43,3 +43,4 @@ skip_commits:
   - '.gitignore'
   - 'App.config'
   - 'appveyor.yml'
+  - 'AssemblyInfo.cs'
