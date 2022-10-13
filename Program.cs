@@ -24,21 +24,21 @@ namespace GeForceNowWindowMover
             if (args.Length > 0)
             {
                 if (Utils.TestObject(Utils.ArgHelper(args), false)) return;
-                if (Utils.processName == String.Empty && lastProcess == null)
+                if (Utils.ProcessName == String.Empty && lastProcess == null)
                 {
                     Settings.Default.lastProcess = String.Empty;
                     Settings.Default.Save();
-                    Console.WriteLine($"No Process with the name {Utils.processName} found and no last process saved!\nPlease make sure the process already started", "No Processname set");
+                    Console.WriteLine($"No Process with the name {Utils.ProcessName} found and no last process saved!\nPlease make sure the process already started", "No Processname set");
                     Utils.PrintConsoleHelp();
                     return;
                 }
-                else if (Utils.processName != String.Empty)
+                else if (Utils.ProcessName != String.Empty)
                 {
-                    lastProcess = Utils.GetProcessByName(Utils.processName);
+                    lastProcess = Utils.GetProcessByName(Utils.ProcessName);
                 }
                 if (lastProcess != null)
                 {
-                    if (Utils.nofixedWindow)
+                    if (Utils.NoFixedWindow)
                     {
                         RunWrapper(lastProcess);
                     }
@@ -51,7 +51,7 @@ namespace GeForceNowWindowMover
                 {
                     Settings.Default.lastProcess = String.Empty;
                     Settings.Default.Save();
-                    Console.WriteLine($"No Process with the name {Utils.processName} or {Settings.Default.lastProcess} found!\nPlease make sure the process already started", "No Process found");
+                    Console.WriteLine($"No Process with the name {Utils.ProcessName} or {Settings.Default.lastProcess} found!\nPlease make sure the process already started", "No Process found");
                     Utils.PrintConsoleHelp();
                     return;
                 }

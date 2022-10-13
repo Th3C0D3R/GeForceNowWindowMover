@@ -43,8 +43,8 @@ namespace GeForceNowWindowMover.Helper
         #endregion
 
         #region Arguments
-        public static bool nofixedWindow { get; set; } = false;
-        public static string processName { get; set; } = string.Empty;
+        public static bool NoFixedWindow { get; set; } = false;
+        public static string ProcessName { get; set; } = string.Empty;
         #endregion
 
         #endregion
@@ -123,9 +123,9 @@ namespace GeForceNowWindowMover.Helper
         public static Process UserChooseProcess()
         {
             Process proc = null;
-            if (Settings.Default.lastProcess.Length > 0 && Settings.Default.lastProcess != null)
+            if (Settings.Default.lastProcess.Length > 0)
             {
-                proc = Utils.GetProcessByName(Settings.Default.lastProcess);
+                proc = GetProcessByName(Settings.Default.lastProcess);
             }
             else
             {
@@ -149,19 +149,19 @@ namespace GeForceNowWindowMover.Helper
                 {
                     case "nofixed":
                     case "n":
-                        nofixedWindow = true;
+                        NoFixedWindow = true;
                         returnValue = true;
                         break;
                     case "fixed":
                     case "f":
-                        nofixedWindow = false;
+                        NoFixedWindow = false;
                         returnValue = true;
                         break;
                     case "process":
                     case "p":
                         if (args[i+1].Length > 0 && !args[i+1].StartsWith("-"))
                         {
-                            processName = args[i + 1].Trim(' ');
+                            ProcessName = args[i + 1].Trim(' ');
                             returnValue = true;
                         }
                         break;
