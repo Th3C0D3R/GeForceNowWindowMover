@@ -1,14 +1,10 @@
-﻿using GeForceNowWindowMover.Properties;
+﻿using GeForceNowWindowMover.Froms;
+using GeForceNowWindowMover.Properties;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GeForceNowWindowMover.Helper
@@ -21,8 +17,6 @@ namespace GeForceNowWindowMover.Helper
         internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-        [DllImport("user32.dll")]
-        private static extern int GetWindowRect(IntPtr hwnd, out Rectangle rect);
         [DllImport("Kernel32.dll", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         private static extern IntPtr GetConsoleWindow();
         [DllImport("User32.dll", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
@@ -38,7 +32,9 @@ namespace GeForceNowWindowMover.Helper
         const int SW_HIDE = 0;
         #endregion
 
-        #region Properties Calculation Size/Position
+        #region Properties 
+
+        #region Calculation Size/Position
         public static int OffsetX { get; set; } = 38;
         public static int OffsetY { get; set; } = 16;
         public static int InnerWidth { get; set; } = 32;
@@ -46,52 +42,78 @@ namespace GeForceNowWindowMover.Helper
         public static int SpaceBorder { get; set; } = 15;
         #endregion
 
+        #region Arguments
+        public static bool NoFixedWindow { get; set; } = false;
+        public static string ProcessName { get; set; } = string.Empty;
+        #endregion
 
+        #region Settings Wrapped
+        public static int Wrapped_X
+        {
+            get
+            {
+                return Settings.Default.Wrapped_X;
+            }
+            set
+            {
+                Settings.Default.Wrapped_X = value;
+                Settings.Default.Save();
+            }
+        }
+        public static int Wrapped_Y
+        {
+            get
+            {
+                return Settings.Default.Wrapped_Y;
+            }
+            set
+            {
+                Settings.Default.Wrapped_Y = value;
+                Settings.Default.Save();
+            }
+        }
+        public static int Wrapped_Width
+        {
+            get
+            {
+                return Settings.Default.Wrapped_Width;
+            }
+            set
+            {
+                Settings.Default.Wrapped_Width = value;
+                Settings.Default.Save();
+            }
+        }
+        public static int Wrapped_Height
+        {
+            get
+            {
+                return Settings.Default.Wrapped_Height;
+            }
+            set
+            {
+                Settings.Default.Wrapped_Height = value;
+                Settings.Default.Save();
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Methods
         public static Process GetProcessByName(string name)
         {
             var processList = Process.GetProcesses();
             foreach (var process in processList)
             {
                 if (process.MainWindowTitle.Length <= 0) continue;
-                if(process.ProcessName == name)
+                if (process.ProcessName == name)
                 {
                     return process;
                 }
             }
             return null;
-        }
-        public static Process ChooseProcess()
-        {
-            Process[] processes = Process.GetProcessesByName("GeForceNOW");
-            while (processes.Length == 0)
-            {
-                Console.WriteLine("No GeForceNOW process found!\nPlease start the game first\nThen press any key in console to continue!");
-                Console.ReadKey();
-                processes = Process.GetProcessesByName("GeForceNOW");
-            }
-            Console.WriteLine("Choose the Process matching the Window-Title (usually '*Gamename* at GeForce NOW')");
-            for (int i = 0; i < processes.Length; i++)
-            {
-                if (processes[i].MainWindowTitle.Length <= 0) continue;
-                Console.WriteLine($"{i + 1}) {processes[i].MainWindowTitle}");
-            }
-            Console.Write("\r\nSelect a process: ");
-            var input = Console.ReadLine();
-            if (input.Length > processes.Length) return ChooseProcess();
-            else
-            {
-                if (int.TryParse(input, out int num))
-                {
-                    if (num == -1)
-                    {
-                        Settings.Default.firstRun = true;
-                        Settings.Default.Save();
-                        ChooseProcess();
-                    }
-                    return processes[num - 1];
-                }
-                else return ChooseProcess();
-            }
         }
         public static void callResizeForm()
         {
@@ -114,7 +136,11 @@ namespace GeForceNowWindowMover.Helper
                 OffsetY = frm.ClientRectangle.Height - frm.pnlInner.Height;
                 InnerWidth = frm.pnlInner.Width + SpaceBorder;
                 InnerHeight = frm.pnlInner.Height + SpaceBorder - 6;
-                MoveWindow(proc.MainWindowHandle, frm.Location.X + (OffsetX/2), frm.Location.Y + (OffsetY + SpaceBorder), InnerWidth, InnerHeight, true);
+                Wrapped_X = frm.Location.X;
+                Wrapped_Y = frm.Location.Y;
+                Wrapped_Height = frm.Height;
+                Wrapped_Width = frm.Width;
+                MoveWindow(proc.MainWindowHandle, frm.Location.X + (OffsetX / 2), frm.Location.Y + (OffsetY + SpaceBorder), InnerWidth, InnerHeight, true);
             }
             else
             {
@@ -132,7 +158,7 @@ namespace GeForceNowWindowMover.Helper
         public static void MinimizeConsole()
         {
             IntPtr hWndConsole = GetConsoleWindow();
-            if(hWndConsole != IntPtr.Zero)
+            if (hWndConsole != IntPtr.Zero)
             {
                 ShowWindow(hWndConsole, SW_HIDE);
             }
@@ -140,13 +166,90 @@ namespace GeForceNowWindowMover.Helper
         public static void PrintConsoleHelp()
         {
             Console.WriteLine($"");
-            Console.WriteLine($"Usage: {Path.GetFileName(Assembly.GetEntryAssembly().Location)} [[--process=|-p=] --nofixed|-nf]");
+            Console.WriteLine($"Usage: ");
+            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--nofixed | -n)");
+            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--nofixed | -n) --process|-p <Processname>");
+            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--fixed | -f)");
+            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--fixed | -f) --process|-p <Processname>");
             Console.WriteLine($"");
-            Console.WriteLine($"If a process name is set with the -(-p)rocess option, the -nofixed is not necessary");
-            Console.WriteLine($"If --nofixed (or -nf) is set, the -(-p)rocess option is necessary!");
             Console.WriteLine($"");
             Console.WriteLine($"PROCESSNAME WITHOUT .EXE/EXTENSION (e.g: GeForceNOW instead of GeForceNOW.exe");
             Console.WriteLine($"");
         }
+        public static Process UserChooseProcess()
+        {
+            Process proc = null;
+            if (Settings.Default.lastProcess.Length > 0)
+            {
+                proc = GetProcessByName(Settings.Default.lastProcess);
+            }
+            else
+            {
+                frmSelectProcess selectProcess = new frmSelectProcess();
+                DialogResult dialog = selectProcess.ShowDialog();
+                if (dialog != DialogResult.OK)
+                {
+                    return null;
+                }
+                proc = selectProcess.selProc;
+            }
+            return proc;
+        }
+        public static object ArgHelper(string[] args)
+        {
+            object returnValue = false;
+            for (int i = 0; i < args.Length; i++)
+            {
+                string arg = args[i].Trim(' ', '-');
+                switch (arg)
+                {
+                    case "nofixed":
+                    case "n":
+                        NoFixedWindow = true;
+                        returnValue = true;
+                        break;
+                    case "fixed":
+                    case "f":
+                        NoFixedWindow = false;
+                        returnValue = true;
+                        break;
+                    case "process":
+                    case "p":
+                        if (args[i + 1].Length > 0 && !args[i + 1].StartsWith("-"))
+                        {
+                            ProcessName = args[i + 1].Trim(' ');
+                            returnValue = true;
+                        }
+                        break;
+                    case "help":
+                    case "h":
+                        PrintConsoleHelp();
+                        Console.ReadKey();
+                        returnValue = false;
+                        break;
+                    case "resizeOnly":
+                    case "r":
+                        callResizeForm();
+                        returnValue = false;
+                        break;
+                    default:
+                        returnValue = false;
+                        break;
+                }
+            }
+            return returnValue;
+        }
+        public static bool TestObject<t>(object testobject, t expect)
+        {
+            if (testobject.GetType() == typeof(t))
+            {
+                if (((t)testobject).Equals(expect))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
     }
 }

@@ -1,7 +1,6 @@
 ﻿using GeForceNowWindowMover.Helper;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace GeForceNowWindowMover
@@ -31,6 +30,13 @@ namespace GeForceNowWindowMover
                     this.proc.Kill();
                 }
             }
+        }
+
+        public void LoadSettings()
+        {
+            this.Height = Utils.Wrapped_Height;
+            this.Width = Utils.Wrapped_Width;
+            this.Location = new System.Drawing.Point(Utils.Wrapped_X,Utils.Wrapped_Y);
         }
     }
 }

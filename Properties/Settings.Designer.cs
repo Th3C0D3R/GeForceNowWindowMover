@@ -49,7 +49,7 @@ namespace GeForceNowWindowMover.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("900")]
         public int Width {
             get {
                 return ((int)(this["Width"]));
@@ -61,7 +61,7 @@ namespace GeForceNowWindowMover.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
         public int Height {
             get {
                 return ((int)(this["Height"]));
@@ -80,6 +80,66 @@ namespace GeForceNowWindowMover.Properties {
             }
             set {
                 this["firstRun"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastProcess {
+            get {
+                return ((string)(this["lastProcess"]));
+            }
+            set {
+                this["lastProcess"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Wrapped_X {
+            get {
+                return ((int)(this["Wrapped_X"]));
+            }
+            set {
+                this["Wrapped_X"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Wrapped_Y {
+            get {
+                return ((int)(this["Wrapped_Y"]));
+            }
+            set {
+                this["Wrapped_Y"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public int Wrapped_Height {
+            get {
+                return ((int)(this["Wrapped_Height"]));
+            }
+            set {
+                this["Wrapped_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("900")]
+        public int Wrapped_Width {
+            get {
+                return ((int)(this["Wrapped_Width"]));
+            }
+            set {
+                this["Wrapped_Width"] = value;
             }
         }
     }
