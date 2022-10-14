@@ -104,6 +104,7 @@ namespace GeForceNowWindowMover
         {
             Utils.MinimizeConsole();
             frmWrapper frmWrapper = new frmWrapper(proc);
+            frmWrapper.LoadSettings();
             frmWrapper.ShowDialog();
         }
 

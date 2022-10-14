@@ -31,5 +31,12 @@ namespace GeForceNowWindowMover
                 }
             }
         }
+
+        public void LoadSettings()
+        {
+            this.Height = Utils.Wrapped_Height;
+            this.Width = Utils.Wrapped_Width;
+            this.Location = new System.Drawing.Point(Utils.Wrapped_X,Utils.Wrapped_Y);
+        }
     }
 }

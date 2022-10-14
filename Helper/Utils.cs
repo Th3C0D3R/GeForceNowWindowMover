@@ -47,6 +47,58 @@ namespace GeForceNowWindowMover.Helper
         public static string ProcessName { get; set; } = string.Empty;
         #endregion
 
+        #region Settings Wrapped
+        public static int Wrapped_X
+        {
+            get
+            {
+                return Settings.Default.Wrapped_X;
+            }
+            set
+            {
+                Settings.Default.Wrapped_X = value;
+                Settings.Default.Save();
+            }
+        }
+        public static int Wrapped_Y
+        {
+            get
+            {
+                return Settings.Default.Wrapped_Y;
+            }
+            set
+            {
+                Settings.Default.Wrapped_Y = value;
+                Settings.Default.Save();
+            }
+        }
+        public static int Wrapped_Width
+        {
+            get
+            {
+                return Settings.Default.Wrapped_Width;
+            }
+            set
+            {
+                Settings.Default.Wrapped_Width = value;
+                Settings.Default.Save();
+            }
+        }
+        public static int Wrapped_Height
+        {
+            get
+            {
+                return Settings.Default.Wrapped_Height;
+            }
+            set
+            {
+                Settings.Default.Wrapped_Height = value;
+                Settings.Default.Save();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Methods
@@ -84,6 +136,10 @@ namespace GeForceNowWindowMover.Helper
                 OffsetY = frm.ClientRectangle.Height - frm.pnlInner.Height;
                 InnerWidth = frm.pnlInner.Width + SpaceBorder;
                 InnerHeight = frm.pnlInner.Height + SpaceBorder - 6;
+                Wrapped_X = frm.Location.X;
+                Wrapped_Y = frm.Location.Y;
+                Wrapped_Height = frm.Height;
+                Wrapped_Width = frm.Width;
                 MoveWindow(proc.MainWindowHandle, frm.Location.X + (OffsetX / 2), frm.Location.Y + (OffsetY + SpaceBorder), InnerWidth, InnerHeight, true);
             }
             else
@@ -144,7 +200,7 @@ namespace GeForceNowWindowMover.Helper
             object returnValue = false;
             for (int i = 0; i < args.Length; i++)
             {
-                string arg = args[i].Trim(' ','-');
+                string arg = args[i].Trim(' ', '-');
                 switch (arg)
                 {
                     case "nofixed":
@@ -159,7 +215,7 @@ namespace GeForceNowWindowMover.Helper
                         break;
                     case "process":
                     case "p":
-                        if (args[i+1].Length > 0 && !args[i+1].StartsWith("-"))
+                        if (args[i + 1].Length > 0 && !args[i + 1].StartsWith("-"))
                         {
                             ProcessName = args[i + 1].Trim(' ');
                             returnValue = true;
