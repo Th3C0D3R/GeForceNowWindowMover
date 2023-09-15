@@ -45,6 +45,8 @@ namespace GeForceNowWindowMover.Helper
         #region Arguments
         public static bool NoFixedWindow { get; set; } = false;
         public static string ProcessName { get; set; } = string.Empty;
+        public static int PreDefHeight { get; set; } = 720;
+        public static int PreDefWidth { get; set; } = 1280;
         #endregion
 
         #region Settings Wrapped
@@ -118,7 +120,8 @@ namespace GeForceNowWindowMover.Helper
         public static void callResizeForm()
         {
             FrmMessure form = new FrmMessure();
-
+            form.Height = PreDefHeight;
+            form.Width = PreDefWidth;
             DialogResult dlgRes = form.ShowDialog();
 
             if (dlgRes != DialogResult.OK && Settings.Default.firstRun)
@@ -167,10 +170,17 @@ namespace GeForceNowWindowMover.Helper
         {
             Console.WriteLine($"");
             Console.WriteLine($"Usage: ");
-            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--nofixed | -n)");
-            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--nofixed | -n) --process|-p <Processname>");
-            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--fixed | -f)");
-            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} (--fixed | -f) --process|-p <Processname>");
+            Console.WriteLine($"  {Path.GetFileName(Assembly.GetEntryAssembly().Location)} [...Options]");
+            Console.WriteLine($"");
+            Console.WriteLine($"");
+            Console.WriteLine($"Options: ");
+            Console.WriteLine($"  --nofixed | -n                  :    Use wrapper window");
+            Console.WriteLine($"  --process | -p <Processname>    :    Predefine process to use");
+            Console.WriteLine($"  --fixed | -f                    :    Use dummy window to define fixed size and position");
+            Console.WriteLine($"  --resizeOnly | -r               :    Only run dummy window to define fixed size and position");
+            Console.WriteLine($"  --height                        :    Predefine Height (ex. 720 or 1080)");
+            Console.WriteLine($"  --width                         :    Predefine Width (ex. 1280 or 1920)");
+            Console.WriteLine($"  --help | -h                     :    Show this");
             Console.WriteLine($"");
             Console.WriteLine($"");
             Console.WriteLine($"PROCESSNAME WITHOUT .EXE/EXTENSION (e.g: GeForceNOW instead of GeForceNOW.exe");
@@ -232,8 +242,27 @@ namespace GeForceNowWindowMover.Helper
                         callResizeForm();
                         returnValue = false;
                         break;
+                    case "height":
+                        if (args[i + 1].Length > 0 && !args[i + 1].StartsWith("-"))
+                        {
+                            if(int.TryParse(args[i + 1].Trim(' '),out int height))
+                            {
+                                PreDefHeight = height;
+                            }
+                            returnValue = true;
+                        }
+                        break;
+                    case "width":
+                        if (args[i + 1].Length > 0 && !args[i + 1].StartsWith("-"))
+                        {
+                            if (int.TryParse(args[i + 1].Trim(' '), out int width))
+                            {
+                                PreDefWidth = width;
+                            }
+                            returnValue = true;
+                        }
+                        break;
                     default:
-                        returnValue = false;
                         break;
                 }
             }

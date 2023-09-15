@@ -17,7 +17,7 @@ namespace GeForceNowWindowMover
             Application.SetCompatibleTextRenderingDefault(false);
             Console.SetWindowSize(113, 19);
             Console.SetBufferSize(113, 3000);
-            if (Settings.Default.lastProcess.Length > 0 || Settings.Default.lastProcess != null)
+            if (Settings.Default.lastProcess.Length > 0 && Settings.Default.lastProcess != null)
             {
                 lastProcess = Utils.GetProcessByName(Settings.Default.lastProcess);
             }
@@ -67,7 +67,7 @@ namespace GeForceNowWindowMover
             Console.Clear();
             Process proc = null;
             int option = -1;
-            Console.WriteLine("If you want to resize the window (fixed position and size), enter '-1' into the next menu!!\n\n");
+            Console.WriteLine("If you want to resize/move the window (fixed position and size), enter '-1' into the next menu!!\n\n");
             Console.WriteLine("Please select the method to modify the game window: ");
             Console.WriteLine($"1 ) [BUGGY] Wrapper Form (the GeForce Now window will be wrapped inside a form which can be moved and resized)");
             Console.WriteLine($"2 ) [RECOMMENDED] Fixed Position and Size (predefine a fixed position and size for the GeForce Now window)");
