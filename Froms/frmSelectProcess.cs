@@ -6,18 +6,18 @@ using System.Windows.Forms;
 
 namespace GeForceNowWindowMover.Froms
 {
-    public partial class frmSelectProcess : Form
+    public partial class FrmSelectProcess : Form
     {
-        public Process selProc { get; set; } = null;
+        public Process SelProc { get; set; } = null;
         private Process selProcPrivat = null;
 
-        public frmSelectProcess()
+        public FrmSelectProcess()
         {
             InitializeComponent();
             RefreshProcessList();
         }
 
-        private void lvProcess_SelectedIndexChanged(object sender, EventArgs e)
+        private void LvProcess_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lvProcess.SelectedItems.Count > 0)
             {
@@ -52,13 +52,13 @@ namespace GeForceNowWindowMover.Froms
             }
         }
 
-        private void btnSelect_Click(object sender, EventArgs e)
+        private void BtnSelect_Click(object sender, EventArgs e)
         {
-            selProc = selProcPrivat;
-            Settings.Default.lastProcess = selProc.ProcessName;
+            SelProc = selProcPrivat;
+            Settings.Default.lastProcess = SelProc.ProcessName;
             Settings.Default.Save();
         }
-        private void btnRefresh_Click(object sender, EventArgs e)
+        private void BtnRefresh_Click(object sender, EventArgs e)
         {
             lvProcess.Items.Clear();
             ilIcons.Images.Clear();

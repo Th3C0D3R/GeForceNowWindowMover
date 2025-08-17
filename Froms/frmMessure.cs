@@ -11,7 +11,7 @@ namespace GeForceNowWindowMover
         {
             InitializeComponent();
         }
-        private void btnOk_Click(object sender, EventArgs e)
+        private void BtnOk_Click(object sender, EventArgs e)
         {
             Settings.Default.X = this.Location.X;
             Settings.Default.Y = this.Location.Y;

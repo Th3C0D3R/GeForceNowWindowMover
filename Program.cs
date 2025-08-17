@@ -65,45 +65,44 @@ namespace GeForceNowWindowMover
         private static void Menu()
         {
             Console.Clear();
-            Process proc = null;
-            int option = -1;
-            Console.WriteLine("If you want to resize/move the window (fixed position and size), enter '-1' into the next menu!!\n\n");
-            Console.WriteLine("Please select the method to modify the game window: ");
+			Console.WriteLine("If you want to resize/move the window (fixed position and size), enter '-1' into the next menu!!\n\n");
+			Console.WriteLine("Please select the method to modify the game window: ");
             Console.WriteLine($"1 ) [BUGGY] Wrapper Form (the GeForce Now window will be wrapped inside a form which can be moved and resized)");
             Console.WriteLine($"2 ) [RECOMMENDED] Fixed Position and Size (predefine a fixed position and size for the GeForce Now window)");
             Console.Write("\r\nSelect a option: ");
             var input = Console.ReadLine();
-            if (!int.TryParse(input, out option)) Menu();
-            if (option == 1)
-            {
-                proc = Utils.UserChooseProcess();
-                if (proc != null)
-                {
-                    RunWrapper(proc);
-                }
-            }
-            else if (option == 2)
-            {
-                proc = Utils.UserChooseProcess();
-                if (proc == null) Menu();
-                else RunFixed(proc);
-            }
-            else if (option == -1)
-            {
-                Settings.Default.firstRun = true;
-                Settings.Default.Save();
-                Menu();
-            }
-            else
-            {
-                Menu();
-            }
-        }
+			if (!int.TryParse(input, out var option)) Menu();
+			Process proc;
+			if (option == 1)
+			{
+				proc = Utils.UserChooseProcess();
+				if (proc != null)
+				{
+					RunWrapper(proc);
+				}
+			}
+			else if (option == 2)
+			{
+				proc = Utils.UserChooseProcess();
+				if (proc == null) Menu();
+				else RunFixed(proc);
+			}
+			else if (option == -1)
+			{
+				Settings.Default.firstRun = true;
+				Settings.Default.Save();
+				Menu();
+			}
+			else
+			{
+				Menu();
+			}
+		}
 
         private static void RunWrapper(Process proc)
         {
             Utils.MinimizeConsole();
-            frmWrapper frmWrapper = new frmWrapper(proc);
+            FrmWrapper frmWrapper = new FrmWrapper(proc);
             frmWrapper.LoadSettings();
             frmWrapper.ShowDialog();
         }
@@ -112,7 +111,7 @@ namespace GeForceNowWindowMover
         {
             while (Settings.Default.firstRun)
             {
-                Utils.callResizeForm();
+                Utils.CallResizeForm();
             }
             Utils.Resize(proc);
         }

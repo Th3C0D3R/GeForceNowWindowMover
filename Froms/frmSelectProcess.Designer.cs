@@ -1,6 +1,6 @@
 ﻿namespace GeForceNowWindowMover.Froms
 {
-    partial class frmSelectProcess
+    partial class FrmSelectProcess
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSelectProcess));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmSelectProcess));
             this.lvProcess = new System.Windows.Forms.ListView();
             this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.btnSelect = new System.Windows.Forms.Button();
@@ -48,7 +48,7 @@
             this.lvProcess.Size = new System.Drawing.Size(299, 480);
             this.lvProcess.TabIndex = 0;
             this.lvProcess.UseCompatibleStateImageBehavior = false;
-            this.lvProcess.SelectedIndexChanged += new System.EventHandler(this.lvProcess_SelectedIndexChanged);
+            this.lvProcess.SelectedIndexChanged += new System.EventHandler(this.LvProcess_SelectedIndexChanged);
             // 
             // ilIcons
             // 
@@ -68,7 +68,7 @@
             this.btnSelect.TabIndex = 1;
             this.btnSelect.Text = "Select";
             this.btnSelect.UseVisualStyleBackColor = true;
-            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
+            this.btnSelect.Click += new System.EventHandler(this.BtnSelect_Click);
             // 
             // btnRefresh
             // 
@@ -81,7 +81,7 @@
             this.btnRefresh.TabIndex = 2;
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.UseVisualStyleBackColor = true;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            this.btnRefresh.Click += new System.EventHandler(this.BtnRefresh_Click);
             // 
             // frmSelectProcess
             // 

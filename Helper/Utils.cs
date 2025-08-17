@@ -117,12 +117,14 @@ namespace GeForceNowWindowMover.Helper
             }
             return null;
         }
-        public static void callResizeForm()
+        public static void CallResizeForm()
         {
-            FrmMessure form = new FrmMessure();
-            form.Height = PreDefHeight;
-            form.Width = PreDefWidth;
-            DialogResult dlgRes = form.ShowDialog();
+			FrmMessure form = new FrmMessure
+			{
+				Height = PreDefHeight,
+				Width = PreDefWidth
+			};
+			DialogResult dlgRes = form.ShowDialog();
 
             if (dlgRes != DialogResult.OK && Settings.Default.firstRun)
             {
@@ -131,7 +133,7 @@ namespace GeForceNowWindowMover.Helper
             Settings.Default.firstRun = false;
             Settings.Default.Save();
         }
-        public static void Resize(Process proc, frmWrapper frm = null)
+        public static void Resize(Process proc, FrmWrapper frm = null)
         {
             if (frm != null)
             {
@@ -150,7 +152,7 @@ namespace GeForceNowWindowMover.Helper
                 MoveWindow(proc.MainWindowHandle, Settings.Default.X, Settings.Default.Y, Settings.Default.Width, Settings.Default.Height, true);
             }
         }
-        public static void StateChange(Process proc, frmWrapper frm, FormWindowState state)
+        public static void StateChange(Process proc, FrmWrapper frm, FormWindowState state)
         {
             if (frm != null)
             {
@@ -188,20 +190,20 @@ namespace GeForceNowWindowMover.Helper
         }
         public static Process UserChooseProcess()
         {
-            Process proc = null;
-            if (Settings.Default.lastProcess.Length > 0)
+			Process proc;
+			if (Settings.Default.lastProcess.Length > 0)
             {
                 proc = GetProcessByName(Settings.Default.lastProcess);
             }
             else
             {
-                frmSelectProcess selectProcess = new frmSelectProcess();
+                FrmSelectProcess selectProcess = new FrmSelectProcess();
                 DialogResult dialog = selectProcess.ShowDialog();
                 if (dialog != DialogResult.OK)
                 {
                     return null;
                 }
-                proc = selectProcess.selProc;
+                proc = selectProcess.SelProc;
             }
             return proc;
         }
@@ -239,7 +241,7 @@ namespace GeForceNowWindowMover.Helper
                         break;
                     case "resizeOnly":
                     case "r":
-                        callResizeForm();
+                        CallResizeForm();
                         returnValue = false;
                         break;
                     case "height":
