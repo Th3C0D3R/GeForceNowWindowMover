@@ -7,7 +7,7 @@ public static class Globals
 {
 	public const string AppName = "GFNWindowMover 2";
 
-	public static IntPtr cmdHandle { get; set; } = IntPtr.Zero;
+	public static IntPtr CmdHandle { get; set; } = IntPtr.Zero;
 	public static Vector2 WindowLocation { get; set; } = default;
 	public static Vector2 WindowSize { get; set; } = default;
 	public static Vector2 GuiLocation { get; set; } = default;

@@ -1,20 +1,117 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 
 using static GFNWindowMover.Utilities.Globals;
 
 namespace GFNWindowMover.Utilities;
 internal static class Utils
 {
+
+	#region Arguments
+	public static bool NoFixedWindow { get; set; } = false;
+	public static string ProcessName { get; set; } = string.Empty;
+	public static int PreDefHeight { get; set; } = 720;
+	public static int PreDefWidth { get; set; } = 1280;
+	#endregion
+
 	public static void Log(string message, string origin = "")
 	{
 		if (!string.IsNullOrWhiteSpace(origin)) origin = $"{origin}";
 		else origin = $"Log";
 #if DEBUG
-            Debugger.Log(0, origin, message + "\n");
-            Console.WriteLine(message);
+		Debugger.Log(0, origin, message + "\n");
+		Console.WriteLine(message);
 #else
 		Console.WriteLine(message);
 #endif
+	}
+
+	public static Process? GetProcessByName(string name)
+	{
+		var processList = Process.GetProcesses();
+		foreach (var process in processList)
+		{
+			if (process.MainWindowTitle.Length <= 0) continue;
+			if (process.ProcessName == name)
+			{
+				return process;
+			}
+		}
+		return null;
+	}
+	public static object ArgHelper(string[] args)
+	{
+		object returnValue = false;
+		for (int i = 0; i < args.Length; i++)
+		{
+			string arg = args[i].Trim(' ', '-');
+			switch (arg)
+			{
+				case "nofixed":
+				case "n":
+					NoFixedWindow = true;
+					returnValue = true;
+					break;
+				case "fixed":
+				case "f":
+					NoFixedWindow = false;
+					returnValue = true;
+					break;
+				case "process":
+				case "p":
+					if (args[i + 1].Length > 0 && !args[i + 1].StartsWith('-'))
+					{
+						ProcessName = args[i + 1].Trim(' ');
+						returnValue = true;
+					}
+					break;
+				//case "help":
+				//case "h":
+				//	PrintConsoleHelp();
+				//	Console.ReadKey();
+				//	returnValue = false;
+				//	break;
+				//case "resizeOnly":
+				//case "r":
+				//	CallResizeForm();
+				//	returnValue = false;
+				//	break;
+				case "height":
+					if (args[i + 1].Length > 0 && !args[i + 1].StartsWith('-'))
+					{
+						if (int.TryParse(args[i + 1].Trim(' '), out int height))
+						{
+							PreDefHeight = height;
+						}
+						returnValue = true;
+					}
+					break;
+				case "width":
+					if (args[i + 1].Length > 0 && !args[i + 1].StartsWith('-'))
+					{
+						if (int.TryParse(args[i + 1].Trim(' '), out int width))
+						{
+							PreDefWidth = width;
+						}
+						returnValue = true;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		return returnValue;
+	}
+	public static bool TestObject<T>(object testobject, T expect)
+	{
+		if (testobject.GetType() == typeof(T))
+		{
+			if (((T)testobject).Equals(expect))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
