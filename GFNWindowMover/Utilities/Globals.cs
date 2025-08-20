@@ -26,6 +26,7 @@ public static class Globals
 
 	public static string _lastProcName = "";
 
+	public static int ScreenSelect = 0;
 
 	public enum XColor
 	{

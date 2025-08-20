@@ -1,6 +1,14 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Text;
+
+using GFNWindowMover.Utilities;
 
 using ImGuiNET;
+
+using Microsoft.VisualBasic;
 
 using Veldrid.MetalBindings;
 
@@ -10,9 +18,14 @@ using static GFNWindowMover.Utilities.Utils;
 namespace GFNWindowMover;
 public static class UI
 {
-	static bool _ChooseProcessVisible;
+	static bool showProcessPopup = false;
+	static string selectedProcess = "";
+	static List<(string WindowTitle, string ProcessName)> processList = new();
+	static int selectedIndex = -1;
+
 	public static void Render()
 	{
+		InitStuff();
 		if (ShowMenu)
 		{
 			DrawMenu();
@@ -22,96 +35,92 @@ public static class UI
 	}
 	static void DrawMenu()
 	{
-		var wa = Screen.PrimaryScreen?.WorkingArea ?? Screen.AllScreens[0].WorkingArea;
-		ImGui.SetNextWindowBgAlpha(10.0f);
-		ImGui.Begin("GFNWindowMover 2 - by TH30D3R", ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoCollapse);
+		ImGui.Begin("Example Overlay", ImGuiWindowFlags.MenuBar);
 
-		ImGui.SetWindowPos(new(wa.Left+10,wa.Top+10));
-		ImGui.SetWindowSize(ImGui.GetWindowSize());
-
-		ImGui.TextColored(VColor.Wheat, $"Last Processname: {Setting.LastProcessName}");
-		ImGui.SameLine(ImGui.GetWindowSize().X - 40);
-		if (ImGui.Button("X"))
-		{
-			Environment.Exit(0);
-			return;
-		}
-		ImGui.TextColored(ProcessLoaded ? VColor.Green : VColor.Red, $"Process found: {ProcessLoaded}");
-
-		if (ImGui.BeginMainMenuBar())
+		// Menu Bar
+		if (ImGui.BeginMenuBar())
 		{
 			if (ImGui.BeginMenu("Program"))
 			{
 				if (ImGui.MenuItem("Restart"))
 				{
-
+					RestartApplication();
 				}
 				if (ImGui.MenuItem("Exit"))
 				{
 					Environment.Exit(0);
-					return;
 				}
 				ImGui.EndMenu();
 			}
+
 			if (ImGui.BeginMenu("Settings"))
 			{
 				if (ImGui.MenuItem("Choose Process"))
 				{
-					ImGui.OpenPopup("Choose Process", ImGuiPopupFlags.AnyPopup);
-					_ChooseProcessVisible = true;
-					DrawSettings();
-
+					LoadProcesses();
+					showProcessPopup = true;
 				}
 				ImGui.EndMenu();
 			}
-			ImGui.EndMainMenuBar();
-		}
-		ImGui.End();
-	}
 
-	static void DrawSettings()
-	{
-		if (_ChooseProcessVisible)
+			ImGui.EndMenuBar();
+		}
+
+		ImGui.Text($"Selected Process: {selectedProcess}");
+
+		// Process Selection Popup
+		if (showProcessPopup)
 		{
-			ImGui.SetNextWindowSize(new System.Numerics.Vector2(300, 150), ImGuiCond.FirstUseEver);
-			if (ImGui.BeginPopupModal("Choose Process", ref _ChooseProcessVisible, ImGuiWindowFlags.NoCollapse))
-			{
-				float windowWidth = ImGui.GetWindowWidth();
-				ImGui.SameLine(windowWidth - 25);
-				if (ImGui.SmallButton("X"))
-				{
-					ImGui.CloseCurrentPopup();
-					_ChooseProcessVisible = false;
-				}
-
-				ImGui.Separator();
-
-				ImGui.Text("This is my popup content!");
-
-				ImGui.Dummy(new Vector2(0, 10));
-
-				if (ImGui.Button("Close"))
-				{
-					ImGui.CloseCurrentPopup();
-					_ChooseProcessVisible = false;
-				}
-
-				ImGui.EndPopup();
-			}
-			else
-			{
-				_ChooseProcessVisible = false;
-			}
-			ImGui.End();
+			ImGui.OpenPopup("Choose Process");
+			//showProcessPopup = false;
 		}
 
+		if (ImGui.BeginPopupModal("Choose Process", ref showProcessPopup, ImGuiWindowFlags.AlwaysAutoResize))
+		{
+			ImGui.Text("Select a process:");
+
+			if (ImGui.BeginListBox("##processList", new Vector2(400, 300)))
+			{
+				for (int i = 0; i < processList.Count; i++)
+				{
+					bool isSelected = (i == selectedIndex);
+					if (ImGui.Selectable($"{processList[i].WindowTitle} ({processList[i].ProcessName})", isSelected))
+					{
+						selectedIndex = i;
+					}
+					if (isSelected)
+						ImGui.SetItemDefaultFocus();
+				}
+				ImGui.EndListBox();
+			}
+
+			if (ImGui.Button("Select"))
+			{
+				if (selectedIndex >= 0)
+				{
+					selectedProcess = processList[selectedIndex].ProcessName;
+					showProcessPopup = false;
+				}
+				ImGui.CloseCurrentPopup();
+			}
+			ImGui.SameLine();
+			if (ImGui.Button("Cancel"))
+			{
+				showProcessPopup = false;
+				ImGui.CloseCurrentPopup();
+			}
+
+			ImGui.EndPopup();
+		}
+
+		ImGui.End();
 	}
 
 	static void DrawOverlay()
 	{
 		//var size = SystemParameters
-		ImGui.SetNextWindowSize(WindowSize);
-		ImGui.SetNextWindowPos(WindowLocation);
+		ImGui.SetNextWindowSize(Globals.WindowSize);
+		ImGui.SetNextWindowPos(Globals.WindowLocation);
 		ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
 			| ImGuiWindowFlags.NoBackground
 			| ImGuiWindowFlags.NoBringToFrontOnFocus
@@ -127,4 +136,64 @@ public static class UI
 			return;
 		}
 	}
+
+
+	static void RestartApplication()
+	{
+		Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+		Environment.Exit(0);
+	}
+
+	static void LoadProcesses()
+	{
+		processList.Clear();
+		EnumWindows((hWnd, lParam) =>
+		{
+			if (IsWindowVisible(hWnd))
+			{
+				int length = GetWindowTextLength(hWnd);
+				if (length == 0) return true;
+
+				StringBuilder sb = new(length + 1);
+				GetWindowText(hWnd, sb, sb.Capacity);
+
+				GetWindowThreadProcessId(hWnd, out uint pid);
+				var proc = Process.GetProcessById((int)pid);
+
+				if (!string.IsNullOrWhiteSpace(sb.ToString()))
+				{
+					if (processList.Any(l => l.ProcessName == proc.ProcessName) == false)
+					{
+						processList.Add((sb.ToString(), proc.ProcessName));
+					}
+				}
+			}
+			return true;
+		}, IntPtr.Zero);
+	}
+
+	static void InitStuff()
+	{
+		Program.SetWindowData(Globals.ScreenSelect);
+	}
+
+	#region WinAPI
+	// WinAPI declarations
+	private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+	[DllImport("user32.dll")]
+	private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+	[DllImport("user32.dll")]
+	private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+	[DllImport("user32.dll")]
+	private static extern int GetWindowTextLength(IntPtr hWnd);
+
+	[DllImport("user32.dll")]
+	private static extern bool IsWindowVisible(IntPtr hWnd);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+	#endregion
 }

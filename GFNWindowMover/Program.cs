@@ -59,4 +59,22 @@ public partial class Program : Overlay
 			OverlayInstance = p;
 		}
 	}
+
+
+
+	public static bool SetWindowData(int idx)
+	{
+		Screen[] screens = Screen.AllScreens;
+		if (idx < 0 || idx >= screens.Length || OverlayInstance == null)
+		{
+			return false;
+		}
+
+		OverlayInstance.Position = screens[idx].WorkingArea.Location;
+		OverlayInstance.Size = screens[idx].WorkingArea.Size;
+
+
+		return true;
+	}
+
 }
