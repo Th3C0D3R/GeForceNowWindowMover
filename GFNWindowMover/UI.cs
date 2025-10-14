@@ -1,8 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 using GFNWindowMover.Utilities;
 
@@ -18,182 +21,207 @@ using static GFNWindowMover.Utilities.Utils;
 namespace GFNWindowMover;
 public static class UI
 {
-	static bool showProcessPopup = false;
-	static string selectedProcess = "";
-	static List<(string WindowTitle, string ProcessName)> processList = new();
-	static int selectedIndex = -1;
+    static bool showProcessPopup = false;
+    static string selectedProcess = "";
+    static List<(string WindowTitle, string ProcessName, Screen? Screen)> processList = new();
+    static int selectedIndex = -1;
 
-	public static void Render()
-	{
-		InitStuff();
-		if (ShowMenu)
-		{
-			DrawMenu();
-			DrawOverlay();
-		}
-		ImGui.End();
-	}
-	static void DrawMenu()
-	{
-		ImGui.Begin("Example Overlay", ImGuiWindowFlags.MenuBar);
+    public static void Render()
+    {
+        InitStuff();
+        if (ShowMenu)
+        {
+            DrawMenu();
+            DrawOverlay();
+        }
+        ImGui.End();
+    }
+    static void DrawMenu()
+    {
+        ImGui.Begin("Example Overlay", ImGuiWindowFlags.MenuBar);
 
-		// Menu Bar
-		if (ImGui.BeginMenuBar())
-		{
-			if (ImGui.BeginMenu("Program"))
-			{
-				if (ImGui.MenuItem("Restart"))
-				{
-					RestartApplication();
-				}
-				if (ImGui.MenuItem("Exit"))
-				{
-					Environment.Exit(0);
-				}
-				ImGui.EndMenu();
-			}
+        // Menu Bar
+        if (ImGui.BeginMenuBar())
+        {
+            if (ImGui.BeginMenu("Program"))
+            {
+                if (ImGui.MenuItem("Restart"))
+                {
+                    RestartApplication();
+                }
+                if (ImGui.MenuItem("Exit"))
+                {
+                    Environment.Exit(0);
+                }
+                ImGui.EndMenu();
+            }
 
-			if (ImGui.BeginMenu("Settings"))
-			{
-				if (ImGui.MenuItem("Choose Process"))
-				{
-					LoadProcesses();
-					showProcessPopup = true;
-				}
-				ImGui.EndMenu();
-			}
+            if (ImGui.BeginMenu("Settings"))
+            {
+                if (ImGui.MenuItem("Choose Process"))
+                {
+                    LoadProcesses();
+                    showProcessPopup = true;
+                }
+                ImGui.EndMenu();
+            }
 
-			ImGui.EndMenuBar();
-		}
+            ImGui.EndMenuBar();
+        }
 
-		ImGui.Text($"Selected Process: {selectedProcess}");
+        ImGui.Text($"Selected Process: {selectedProcess}");
 
-		// Process Selection Popup
-		if (showProcessPopup)
-		{
-			ImGui.OpenPopup("Choose Process");
-			//showProcessPopup = false;
-		}
+        // Process Selection Popup
+        if (showProcessPopup)
+        {
+            ImGui.OpenPopup("Choose Process");
+            //showProcessPopup = false;
+        }
 
-		if (ImGui.BeginPopupModal("Choose Process", ref showProcessPopup, ImGuiWindowFlags.AlwaysAutoResize))
-		{
-			ImGui.Text("Select a process:");
+        if (ImGui.BeginPopupModal("Choose Process", ref showProcessPopup, ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            ImGui.Text("Select a process:");
 
-			if (ImGui.BeginListBox("##processList", new Vector2(400, 300)))
-			{
-				for (int i = 0; i < processList.Count; i++)
-				{
-					bool isSelected = (i == selectedIndex);
-					if (ImGui.Selectable($"{processList[i].WindowTitle} ({processList[i].ProcessName})", isSelected))
-					{
-						selectedIndex = i;
-					}
-					if (isSelected)
-						ImGui.SetItemDefaultFocus();
-				}
-				ImGui.EndListBox();
-			}
+            if (ImGui.BeginListBox("##processList", new Vector2(400, 300)))
+            {
+                for (int i = 0; i < processList.Count; i++)
+                {
+                    bool isSelected = (i == selectedIndex);
+                    if (ImGui.Selectable($"{processList[i].WindowTitle} ({processList[i].ProcessName})", isSelected))
+                    {
+                        selectedIndex = i;
+                    }
+                    if (isSelected)
+                        ImGui.SetItemDefaultFocus();
+                }
+                ImGui.EndListBox();
+            }
 
-			if (ImGui.Button("Select"))
-			{
-				if (selectedIndex >= 0)
-				{
-					selectedProcess = processList[selectedIndex].ProcessName;
-					showProcessPopup = false;
-				}
-				ImGui.CloseCurrentPopup();
-			}
-			ImGui.SameLine();
-			if (ImGui.Button("Cancel"))
-			{
-				showProcessPopup = false;
-				ImGui.CloseCurrentPopup();
-			}
+            if (ImGui.Button("Select"))
+            {
+                if (selectedIndex >= 0)
+                {
+                    selectedProcess = processList[selectedIndex].ProcessName;
+                    showProcessPopup = false;
+                }
+                ImGui.CloseCurrentPopup();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Cancel"))
+            {
+                showProcessPopup = false;
+                ImGui.CloseCurrentPopup();
+            }
 
-			ImGui.EndPopup();
-		}
+            ImGui.EndPopup();
+        }
 
-		ImGui.End();
-	}
+        ImGui.End();
+    }
 
-	static void DrawOverlay()
-	{
-		//var size = SystemParameters
-		ImGui.SetNextWindowSize(Globals.WindowSize);
-		ImGui.SetNextWindowPos(Globals.WindowLocation);
-		ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
-			| ImGuiWindowFlags.NoBackground
-			| ImGuiWindowFlags.NoBringToFrontOnFocus
-			| ImGuiWindowFlags.NoMove
-			| ImGuiWindowFlags.NoInputs
-			| ImGuiWindowFlags.NoCollapse
-			| ImGuiWindowFlags.NoScrollbar
-			| ImGuiWindowFlags.NoScrollWithMouse);
+    static void DrawOverlay()
+    {
+        //var size = SystemParameters
+        ImGui.SetNextWindowSize(Globals.WindowSize);
+        ImGui.SetNextWindowPos(Globals.WindowLocation);
+        ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
+            | ImGuiWindowFlags.NoBackground
+            | ImGuiWindowFlags.NoBringToFrontOnFocus
+            | ImGuiWindowFlags.NoMove
+            | ImGuiWindowFlags.NoInputs
+            | ImGuiWindowFlags.NoCollapse
+            | ImGuiWindowFlags.NoScrollbar
+            | ImGuiWindowFlags.NoScrollWithMouse);
 
-		if (ImGui.IsKeyPressed(ImGuiKey.End))
-		{
-			Environment.Exit(0);
-			return;
-		}
-	}
+        if (ImGui.IsKeyPressed(ImGuiKey.End))
+        {
+            Environment.Exit(0);
+            return;
+        }
+    }
 
 
-	static void RestartApplication()
-	{
-		Process.Start(Process.GetCurrentProcess().MainModule.FileName);
-		Environment.Exit(0);
-	}
+    static void RestartApplication()
+    {
+        Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? Process.GetCurrentProcess().StartInfo.FileName);
+        Environment.Exit(0);
+    }
 
-	static void LoadProcesses()
-	{
-		processList.Clear();
-		EnumWindows((hWnd, lParam) =>
-		{
-			if (IsWindowVisible(hWnd))
-			{
-				int length = GetWindowTextLength(hWnd);
-				if (length == 0) return true;
+    static void LoadProcesses()
+    {
+        processList.Clear();
+        EnumWindows((hWnd, lParam) =>
+        {
+            if (!IsWindowVisible(hWnd)) return true;
 
-				StringBuilder sb = new(length + 1);
-				GetWindowText(hWnd, sb, sb.Capacity);
+            int length = GetWindowTextLength(hWnd);
+            if (length == 0) return true;
 
-				GetWindowThreadProcessId(hWnd, out uint pid);
-				var proc = Process.GetProcessById((int)pid);
+            StringBuilder sb = new(length + 1);
+            GetWindowText(hWnd, sb, sb.Capacity);
 
-				if (!string.IsNullOrWhiteSpace(sb.ToString()))
-				{
-					if (processList.Any(l => l.ProcessName == proc.ProcessName) == false)
-					{
-						processList.Add((sb.ToString(), proc.ProcessName));
-					}
-				}
-			}
-			return true;
-		}, IntPtr.Zero);
-	}
+            GetWindowThreadProcessId(hWnd, out uint pid);
+            var proc = Process.GetProcessById((int)pid);
 
-	static void InitStuff()
-	{
-		Program.SetWindowData(Globals.ScreenSelect);
-	}
+            if (string.IsNullOrWhiteSpace(sb.ToString()))
+                return true;
 
-	#region WinAPI
-	// WinAPI declarations
-	private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+            if (processList.Any(l => l.ProcessName == proc.ProcessName))
+                return true;
 
-	[DllImport("user32.dll")]
-	private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+            // 🖥️ Get window rectangle
+            if (GetWindowRect(hWnd, out RECT rect))
+            {
+                var windowCenter = new System.Drawing.Point(
+                    rect.Left + (rect.Right - rect.Left) / 2,
+                    rect.Top + (rect.Bottom - rect.Top) / 2
+                );
 
-	[DllImport("user32.dll")]
-	private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+                // Find which screen contains this point
+                var screen = Screen.AllScreens.FirstOrDefault(s => s.Bounds.Contains(windowCenter));
 
-	[DllImport("user32.dll")]
-	private static extern int GetWindowTextLength(IntPtr hWnd);
+                processList.Add((sb.ToString(), proc.ProcessName, screen));
+            }
 
-	[DllImport("user32.dll")]
-	private static extern bool IsWindowVisible(IntPtr hWnd);
 
-	[DllImport("user32.dll", SetLastError = true)]
-	private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
-	#endregion
+            return true;
+        }, IntPtr.Zero);
+    }
+
+    static void InitStuff()
+    {
+        Program.SetWindowData(Globals.ScreenSelect);
+    }
+
+    #region WinAPI
+    // WinAPI declarations
+    private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+    [DllImport("user32.dll")]
+    private static extern int GetWindowTextLength(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+    #endregion
 }
