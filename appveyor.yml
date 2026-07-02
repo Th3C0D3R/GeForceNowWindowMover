@@ -1,4 +1,4 @@
-version: 0.0.{build}
+version: 0.1.{build}
 pull_requests:
   do_not_increment_build_number: true
 branches:
@@ -9,32 +9,8 @@ image: Visual Studio 2022
 configuration: Release
 platform: x64
 build:
-  project: GeForceNowWindowMover.csproj
+  project: GFNWindowMover.csproj
   verbosity: normal
-after_build:
-- cmd: 7z a GFN_WindowMover.zip %APPVEYOR_BUILD_FOLDER%\Release\*.exe %APPVEYOR_BUILD_FOLDER%\Release\*.exe.config
-artifacts:
-- path: GFN_WindowMover.zip
-  name: deploy
-assembly_info:
-  patch: true
-  file: AssemblyInfo.*
-  assembly_version: "0.0.{build}"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
-deploy:
-- provider: GitHub
-  tag: v$(appveyor_build_version)
-  release: GFNWindowMover-v$(appveyor_build_version)
-  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)\n$(APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)
-  auth_token:
-    secure: Jib02JvY9eExnO/sKNidWw8d5URXJ2xl7jY1iJXYqVWlAwwaBMHkNA+mHslpIjjJ
-  artifact: deploy
-  draft: false
-  prerelease: false
-  force_update: true
-  on:
-    branch: main
 skip_commits:
   files:
   - '*.md'
@@ -43,4 +19,3 @@ skip_commits:
   - '.gitignore'
   - 'App.config'
   - 'appveyor.yml'
-  - 'AssemblyInfo.cs'

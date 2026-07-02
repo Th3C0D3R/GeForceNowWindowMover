@@ -8,7 +8,12 @@
 		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 		<StartupObject>GFNWindowMover.Program</StartupObject>
 		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>a4c1e581950627.5d0f0adec8557.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="a4c1e581950627.5d0f0adec8557.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="ClickableTransparentOverlay" Version="11.1.0" />

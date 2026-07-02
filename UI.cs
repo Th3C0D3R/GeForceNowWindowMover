@@ -120,8 +120,6 @@ public static class UI
             _statusMessage = _isWorkingEnabled ? "Window lock enabled." : "Window lock disabled.";
         }
         ImGui.SameLine();
-        ImGui.Text($"Selected Process: {(string.IsNullOrWhiteSpace(LastProcessName) ? "<none>" : LastProcessName)}");
-        ImGui.SameLine();
         if (ImGui.Button("Choose Process"))
         {
             LoadProcesses();
@@ -132,6 +130,7 @@ public static class UI
         {
             TargetProcess = Utils.GetProcessByName(LastProcessName);
         }
+        ImGui.Text($"Selected Process: {(string.IsNullOrWhiteSpace(LastProcessName) ? "<none>" : LastProcessName)}");
         
         
         ImGui.Spacing();
@@ -142,11 +141,15 @@ public static class UI
         if (ImGui.RadioButton("Fixed Position/Size", isFixed))
         {
             SetMode(RunMode.Fixed);
+            _showFixedEditor = false;
+            _showWrapperWindow = false;
         }
         ImGui.SameLine();
         if (ImGui.RadioButton("Wrapper Window", !isFixed))
         {
             SetMode(RunMode.Wrapper);
+            _showFixedEditor = false;
+            _showWrapperWindow = true;
         }
 
         ImGui.Spacing();
@@ -155,20 +158,7 @@ public static class UI
             _showFixedEditor = true;
             _showWrapperWindow = false;
         }
-        ImGui.SameLine();
-        if (ImGui.Button("Start Fixed Mode"))
-        {
-            SetMode(RunMode.Fixed);
-            _showFixedEditor = false;
-            _showWrapperWindow = false;
-        }
-        ImGui.SameLine();
-        if (ImGui.Button("Start Wrapper Mode"))
-        {
-            SetMode(RunMode.Wrapper);
-            _showWrapperWindow = true;
-            _showFixedEditor = false;
-        }
+
 
         ImGui.Spacing();
         if (!string.IsNullOrWhiteSpace(_statusMessage))
