@@ -1,16 +1,16 @@
-﻿using System.Diagnostics;
-
-using ClickableTransparentOverlay;
-
+﻿using ClickableTransparentOverlay;
 using GFNWindowMover.Utilities;
-
 using static GFNWindowMover.Utilities.Globals;
 
 namespace GFNWindowMover;
 
 public partial class Program : Overlay
 {
-	private static Process? lastProcess;
+	public Program()
+	{
+		OverlayInstance = this;
+	}
+
 	protected override void Render()
 	{
 		UI.Render();
@@ -18,63 +18,41 @@ public partial class Program : Overlay
 
 	static void Main(string[] args)
 	{
-		if (Setting.LastProcessName.Length > 0 && Setting.LastProcessName != null)
+		_ = Setting;
+
+		if (args.Length > 0 && Utils.TestObject(Utils.ArgHelper(args), false))
 		{
-			lastProcess = Utils.GetProcessByName(Setting.LastProcessName);
+			return;
 		}
-		if (args.Length > 0)
+
+		if (!string.IsNullOrWhiteSpace(Utils.ProcessName))
 		{
-			if (Utils.TestObject(Utils.ArgHelper(args), false)) return;
-			if (Utils.ProcessName == string.Empty && lastProcess == null)
-			{
-
-				return;
-			}
-			else if (Utils.ProcessName != string.Empty)
-			{
-				lastProcess = Utils.GetProcessByName(Utils.ProcessName);
-			}
-			if (lastProcess != null)
-			{
-				if (Utils.NoFixedWindow)
-				{
-					//RunWrapper(lastProcess);
-				}
-				else
-				{
-					//RunFixed(lastProcess);
-				}
-			}
-			else
-			{
-
-				return;
-			}
+			LastProcessName = Utils.ProcessName;
+			Setting.LastProcessName = Utils.ProcessName;
 		}
 		else
 		{
-			Program p = new();
-			p.Start().Wait();
-
-			OverlayInstance = p;
+			LastProcessName = Setting.LastProcessName ?? string.Empty;
 		}
-	}
 
-
-
-	public static bool SetWindowData(int idx)
-	{
-		Screen[] screens = Screen.AllScreens;
-		if (idx < 0 || idx >= screens.Length || OverlayInstance == null)
+		ActiveMode = Utils.NoFixedWindow ? RunMode.Wrapper : ActiveMode;
+		if (args.Length > 0 && !Utils.NoFixedWindow)
 		{
-			return false;
+			ActiveMode = RunMode.Fixed;
 		}
 
-		OverlayInstance.Position = screens[idx].WorkingArea.Location;
-		OverlayInstance.Size = screens[idx].WorkingArea.Size;
+		if (Utils.ResizeOnly)
+		{
+			ActiveMode = RunMode.Fixed;
+			UI.OpenFixedEditorOnStart = true;
+		}
 
+		Setting.LastUseWrapperMode = ActiveMode == RunMode.Wrapper;
+		Setting.SaveSettings();
 
-		return true;
+		TargetProcess = Utils.GetProcessByName(LastProcessName);
+
+		Program p = new();
+		p.Start().Wait();
 	}
-
 }
