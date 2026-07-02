@@ -8,6 +8,7 @@ namespace GFNWindowMover.Utilities;
 internal static class Utils
 {
 	private static DateTime _nextResolveAttemptUtc = DateTime.MinValue;
+	private static ManagedWindowState? _managedWindowState;
 
 	#region Arguments
 	public static bool NoFixedWindow { get; set; }
@@ -21,11 +22,20 @@ internal static class Utils
 	private static extern bool MoveWindow(IntPtr hWnd, int x, int y, int nWidth, int nHeight, bool bRepaint);
 	[DllImport("user32.dll", SetLastError = true)]
 	private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+	[DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
+	private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
+	[DllImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
+	private static extern int GetWindowLong32(IntPtr hWnd, int nIndex);
 
 	private static readonly IntPtr HWND_TOPMOST = new(-1);
+	private static readonly IntPtr HWND_NOTOPMOST = new(-2);
 	private const uint SWP_NOSIZE = 0x0001;
 	private const uint SWP_NOMOVE = 0x0002;
 	private const uint SWP_NOACTIVATE = 0x0010;
+	private const int GWL_EXSTYLE = -20;
+	private const int WS_EX_TOPMOST = 0x00000008;
 
 	public static void Log(string message, string origin = "Log")
 	{
@@ -109,7 +119,75 @@ internal static class Utils
 			return false;
 		}
 
+		TrackManagedWindow(proc);
 		return SetWindowPos(proc.MainWindowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+
+	public static void ReleaseManagedWindow(bool restoreBounds)
+	{
+		if (_managedWindowState == null)
+		{
+			return;
+		}
+
+		ManagedWindowState state = _managedWindowState.Value;
+		_managedWindowState = null;
+
+		if (state.Handle == IntPtr.Zero)
+		{
+			return;
+		}
+
+		if (!state.WasTopMostInitially)
+		{
+			SetWindowPos(state.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+		}
+
+		if (restoreBounds && state.OriginalWidth > 0 && state.OriginalHeight > 0)
+		{
+			MoveWindow(state.Handle, state.OriginalX, state.OriginalY, state.OriginalWidth, state.OriginalHeight, true);
+		}
+	}
+
+	private static void TrackManagedWindow(Process proc)
+	{
+		IntPtr handle = proc.MainWindowHandle;
+		if (handle == IntPtr.Zero)
+		{
+			return;
+		}
+
+		if (_managedWindowState != null && _managedWindowState.Value.Handle == handle)
+		{
+			return;
+		}
+
+		// Switching targets: drop topmost on old one but keep its current placement.
+		ReleaseManagedWindow(restoreBounds: false);
+
+		if (!GetWindowRect(handle, out RECT rect))
+		{
+			return;
+		}
+
+		bool wasTopMostInitially = (GetWindowExStyle(handle) & WS_EX_TOPMOST) == WS_EX_TOPMOST;
+		_managedWindowState = new ManagedWindowState(
+			handle,
+			wasTopMostInitially,
+			rect.Left,
+			rect.Top,
+			rect.Right - rect.Left,
+			rect.Bottom - rect.Top
+		);
+	}
+
+	private static int GetWindowExStyle(IntPtr hWnd)
+	{
+		if (IntPtr.Size == 8)
+		{
+			return (int)GetWindowLongPtr64(hWnd, GWL_EXSTYLE).ToInt64();
+		}
+		return GetWindowLong32(hWnd, GWL_EXSTYLE);
 	}
 
 	public static object ArgHelper(string[] args)
@@ -211,6 +289,24 @@ internal static class Utils
 
 		value = next;
 		return true;
+	}
+
+	private readonly record struct ManagedWindowState(
+		IntPtr Handle,
+		bool WasTopMostInitially,
+		int OriginalX,
+		int OriginalY,
+		int OriginalWidth,
+		int OriginalHeight
+	);
+
+	[StructLayout(LayoutKind.Sequential)]
+	private struct RECT
+	{
+		public int Left;
+		public int Top;
+		public int Right;
+		public int Bottom;
 	}
 }
 

@@ -1,6 +1,7 @@
 ﻿using ClickableTransparentOverlay;
 using GFNWindowMover.Utilities;
 using static GFNWindowMover.Utilities.Globals;
+using System.Threading.Tasks;
 
 namespace GFNWindowMover;
 
@@ -18,6 +19,15 @@ public partial class Program : Overlay
 
 	static void Main(string[] args)
 	{
+		AppDomain.CurrentDomain.ProcessExit += (_, _) => Utils.ReleaseManagedWindow(restoreBounds: true);
+		AppDomain.CurrentDomain.UnhandledException += (_, _) => Utils.ReleaseManagedWindow(restoreBounds: true);
+		TaskScheduler.UnobservedTaskException += (_, e) =>
+		{
+			Utils.ReleaseManagedWindow(restoreBounds: true);
+			e.SetObserved();
+		};
+		Console.CancelKeyPress += (_, _) => Utils.ReleaseManagedWindow(restoreBounds: true);
+
 		_ = Setting;
 
 		if (args.Length > 0 && Utils.TestObject(Utils.ArgHelper(args), false))

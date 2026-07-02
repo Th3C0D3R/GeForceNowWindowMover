@@ -113,6 +113,10 @@ public static class UI
         if (ImGui.Button(_isWorkingEnabled ? "Disable" : "Enable"))
         {
             _isWorkingEnabled = !_isWorkingEnabled;
+            if (!_isWorkingEnabled)
+            {
+                Utils.ReleaseManagedWindow(restoreBounds: false);
+            }
             _statusMessage = _isWorkingEnabled ? "Window lock enabled." : "Window lock disabled.";
         }
         ImGui.SameLine();
@@ -214,6 +218,7 @@ public static class UI
         {
             ProcessItem item = _processList[_selectedIndex];
             LastProcessName = item.ProcessName;
+            Utils.ReleaseManagedWindow(restoreBounds: false);
             if (!string.Equals(Setting.LastProcessName, LastProcessName, StringComparison.OrdinalIgnoreCase))
             {
                 Setting.LastProcessName = LastProcessName;
@@ -476,6 +481,10 @@ public static class UI
         }
 
         ActiveMode = mode;
+        if (mode != RunMode.Wrapper)
+        {
+            Utils.ReleaseManagedWindow(restoreBounds: false);
+        }
         Setting.LastUseWrapperMode = mode == RunMode.Wrapper;
         Setting.SaveSettings();
     }
