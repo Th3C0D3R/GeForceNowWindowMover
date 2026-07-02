@@ -5,28 +5,87 @@
 [![GitHub issues](https://img.shields.io/github/issues/Th3C0D3R/GeForceNowWindowMover?style=flat-square)](https://github.com/Th3C0D3R/GeForceNowWindowMover/issues)
 [![GitHub license](https://img.shields.io/github/license/Th3C0D3R/GeForceNowWindowMover?style=flat-square)](https://github.com/Th3C0D3R/GeForceNowWindowMover/blob/main/LICENSE)
 
+GFN WindowMover is a Windows tool to lock a target window to a defined area. It was built for the GeForce NOW game window, but it can also be used for other applications.
 
-This Application exists because I could not find a working programm to resize/move the game window which 
-GeForce NOW shows when inside a game. CAN BE USED WITH ANY OTHER PROGRAM. BUT MAY HAVE SOME UNEXPECTED BEHAVIOR.
-Will test with different games and programs in the future. If you have any suggestions, please create an issue.
+## Features
+- **Fixed mode**: lock a window to a saved position and size.
+- **Wrapper mode**: lock a window into a live wrapper area that you can resize and move.
+- **Process picker UI**: choose the target process from visible windows.
+- **Enable/Disable toggle**: quickly turn locking on or off.
+- **Multi-monitor support**: works across the full virtual desktop.
 
-## HOW TO USE (precompiled)
-1. Start GeForce NOW and start the game you want
-2. When the game is fullscreen run the `GFNWindowMover.exe`
-3. Choose your Window by finding the Process via the "Choose Process" button
-4. Choose your desired Mode (Fixed, Wrapped)
-4.1 If you choose Fixed, you can set the desired position and size of the window via the "Open Fixed Region Editor" button
-4.2 If you choose Wrapped, the window should automatically resize to the size of the wrapper window. You can resize the wrapper window as you like.
+## How to use
+1. Start the application you want to control (for example GeForce NOW in-game window).
+2. Run `GFNWindowMover.exe`.
+3. Click **Choose Process** and select the target process from the list.
+4. Select the mode:
+   - **Fixed Position/Size**
+   - **Wrapper Window**
+5. If you use **Fixed mode**:
+   - click **Open Fixed Region Editor**
+   - move/resize the editor to the desired target region
+   - click **Save Region** or **Save + Run Fixed**
+6. If you use **Wrapper mode**:
+   - click **Start Wrapper Mode**
+   - move/resize the wrapper window; the target is locked to the inner area
+7. Use **Disable** to temporarily stop locking and move the target window freely; use **Enable** to lock again.
 
+## Compile instructions
+### Prerequisites
+- Windows
+- .NET SDK (matching project target)
+- Visual Studio 2022 or `dotnet` CLI
 
-The Program does need to set the game/programs window parameters to display it above all other windows.
-This may be problems with some anticheat software. If you have problems with the program, please create an issue.
+### Build with Visual Studio
+1. Open `GeForceNowWindowMover.sln`
+2. Select `Release` (or `Debug`)
+3. Build the solution
 
-## Compile your own
-Just clone the repo and compile, it should work out of the box (I compiled it with Visual Studio 2022)
+### Build with dotnet CLI
+```powershell
+dotnet restore
+dotnet build .\GFNWindowMover.csproj -c Release
+```
+
+Output binaries are placed in:
+`.\bin\Release\...`
 
 ## Screenshots
+### Fixed mode example
 ![Fixed Example](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/image1.png)
+
+### Process list UI
 ![Process List](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/image2.png)
+
+### Wrapped mode example
 ![Wrapper Example](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/image3.png)
+
+### Wrapped mode docked to main UI
 ![Docked Wrapper Example](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/image4.png)
+
+## Contributions
+Contributions are welcome.
+1. Fork the repository.
+2. Create a branch for your change.
+3. Keep changes focused and test locally.
+4. Open a Pull Request with a clear description of what changed and why.
+
+## Issues
+If you found a bug or want to request a feature, please create an issue:
+- Include steps to reproduce
+- Include expected vs actual behavior
+- Add screenshots/log output if available
+- Include OS/version and app version
+
+Issue tracker: https://github.com/Th3C0D3R/GeForceNowWindowMover/issues
+
+## Support
+If you want to support this project:
+- PayPal: https://www.paypal.com/donate/?hosted_button_id=6GEJJC4RHRAAW
+- ko-fi: https://ko-fi.com/th3c0d3r
+- GitHub Sponsor: https://github.com/sponsors/Th3C0D3R
+- BTC address: bc1q8v4zfqjqsq5fawv7l7874es2dmt9mclx67yxpd
+
+## Legal notice
+This software is provided **as is**, without warranty of any kind. Use at your own risk.
+All rights and license terms for this repository are defined in [LICENSE](./LICENSE).
