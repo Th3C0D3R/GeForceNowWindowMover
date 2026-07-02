@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+		<StartupObject>GFNWindowMover.Program</StartupObject>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>a4c1e581950627.5d0f0adec8557.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="a4c1e581950627.5d0f0adec8557.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ClickableTransparentOverlay" Version="11.1.0" />
+		<PackageReference Include="ImGui.NET" Version="1.91.6.1" />
+		<PackageReference Include="Microsoft.NETCore.App" Version="2.2.8" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+		<PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
+		<PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
+	</ItemGroup>
+
+</Project>
