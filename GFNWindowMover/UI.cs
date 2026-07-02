@@ -22,6 +22,7 @@ public static class UI
     private static bool _showWrapperWindow;
     private static bool _initialized;
     private static string _statusMessage = string.Empty;
+    private static bool _isWorkingEnabled = true;
     private static DateTime _lastWrapperSaveUtc = DateTime.MinValue;
     private static Rect _wrapperInnerRect = new(0, 0, 0, 0);
     private static readonly long _moveIntervalTicks = Stopwatch.Frequency / 60;
@@ -109,6 +110,12 @@ public static class UI
             ImGui.EndMenuBar();
         }
 
+        if (ImGui.Button(_isWorkingEnabled ? "Disable" : "Enable"))
+        {
+            _isWorkingEnabled = !_isWorkingEnabled;
+            _statusMessage = _isWorkingEnabled ? "Window lock enabled." : "Window lock disabled.";
+        }
+        ImGui.SameLine();
         ImGui.Text($"Selected Process: {(string.IsNullOrWhiteSpace(LastProcessName) ? "<none>" : LastProcessName)}");
         ImGui.SameLine();
         if (ImGui.Button("Choose Process"))
@@ -121,7 +128,8 @@ public static class UI
         {
             TargetProcess = Utils.GetProcessByName(LastProcessName);
         }
-
+        
+        
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
@@ -326,6 +334,11 @@ public static class UI
 
     private static void ApplyWindowMove()
     {
+        if (!_isWorkingEnabled)
+        {
+            return;
+        }
+
         Process? target = Utils.ResolveTargetProcess();
         if (target == null)
         {
