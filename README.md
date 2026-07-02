@@ -1,5 +1,5 @@
 # GeForceNow WindowMover
-[![GitHub tag](https://img.shields.io/github/tag/TH3C0D3R/GeForceNowWindowMover?style=flat-square&include_prereleases=&sort=semver&color=blue)](https://github.com/TH3C0D3R/GeForceNowWindowMover/releases/)
+[![GitHub tag](https://img.shields.io/github/v/tag/TH3C0D3R/GeForceNowWindowMover?style=flat-square&include_prereleases=&sort=semver&color=blue)](https://github.com/TH3C0D3R/GeForceNowWindowMover/releases/)
 ![OS - windows](https://img.shields.io/badge/OS-windows-2ea44f?logo=windows&logoColor=%230078D6)
 [![Build status](https://ci.appveyor.com/api/projects/status/b2uaiyw07c9v2b2g?svg=true)](https://ci.appveyor.com/project/Th3C0D3R/gfnwindowmover)
 [![GitHub issues](https://img.shields.io/github/issues/Th3C0D3R/GeForceNowWindowMover?style=flat-square)](https://github.com/Th3C0D3R/GeForceNowWindowMover/issues)
