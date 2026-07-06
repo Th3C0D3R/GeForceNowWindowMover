@@ -77,8 +77,10 @@ public static class UI
 
     private static void DrawControlWindow()
     {
+        SetSafeInitialControlWindowPosition();
         ImGui.SetNextWindowSize(new Vector2(640, 350), ImGuiCond.FirstUseEver);
         ImGui.Begin("GFN WindowMover", ImGuiWindowFlags.MenuBar);
+        ClampCurrentWindowIntoVisibleDesktop();
 
         if (ImGui.BeginMenuBar())
         {
@@ -244,6 +246,7 @@ public static class UI
             ImGui.End();
             return;
         }
+        ClampCurrentWindowIntoVisibleDesktop();
 
         ImGui.Text("Move and resize this window to the target region.");
         if (ImGui.Button("Save Region (keeps this window open)"))
@@ -307,6 +310,7 @@ public static class UI
             ImGui.End();
             return;
         }
+        ClampCurrentWindowIntoVisibleDesktop();
 
         ImGui.Text("The selected process is continuously moved into the inner area below.");
         Vector2 innerPos = ImGui.GetCursorScreenPos();
@@ -479,14 +483,62 @@ public static class UI
         Setting.SaveSettings();
     }
 
+    private static void SetSafeInitialControlWindowPosition()
+    {
+        if (_lastOverlayRect.Width <= 0 || _lastOverlayRect.Height <= 0)
+        {
+            return;
+        }
+
+        const int margin = 40;
+        var safeAbsolutePos = new Vector2(_lastOverlayRect.X + margin, _lastOverlayRect.Y + margin);
+        ImGui.SetNextWindowPos(ToOverlaySpace(safeAbsolutePos), ImGuiCond.FirstUseEver);
+    }
+
+    private static void ClampCurrentWindowIntoVisibleDesktop()
+    {
+        if (_lastOverlayRect.Width <= 0 || _lastOverlayRect.Height <= 0)
+        {
+            return;
+        }
+
+        Vector2 windowSize = ImGui.GetWindowSize();
+        if (windowSize.X <= 0 || windowSize.Y <= 0)
+        {
+            return;
+        }
+
+        Vector2 absolutePos = ToAbsoluteDesktopSpace(ImGui.GetWindowPos());
+
+        float minX = _lastOverlayRect.X;
+        float minY = _lastOverlayRect.Y;
+        float maxX = Math.Max(minX, _lastOverlayRect.X + _lastOverlayRect.Width - windowSize.X);
+        float maxY = Math.Max(minY, _lastOverlayRect.Y + _lastOverlayRect.Height - windowSize.Y);
+
+        float clampedX = Math.Clamp(absolutePos.X, minX, maxX);
+        float clampedY = Math.Clamp(absolutePos.Y, minY, maxY);
+        if (Math.Abs(clampedX - absolutePos.X) < 0.5f && Math.Abs(clampedY - absolutePos.Y) < 0.5f)
+        {
+            return;
+        }
+
+        ImGui.SetWindowPos(ToOverlaySpace(new Vector2(clampedX, clampedY)), ImGuiCond.Always);
+    }
+
     private static Vector2 ToAbsoluteDesktopSpace(Vector2 overlaySpace)
     {
-        return new Vector2(overlaySpace.X + _lastOverlayRect.X, overlaySpace.Y + _lastOverlayRect.Y);
+        Vector2 viewportPos = ImGui.GetMainViewport().Pos;
+        return new Vector2(
+            overlaySpace.X - viewportPos.X + _lastOverlayRect.X,
+            overlaySpace.Y - viewportPos.Y + _lastOverlayRect.Y);
     }
 
     private static Vector2 ToOverlaySpace(Vector2 absoluteDesktopSpace)
     {
-        return new Vector2(absoluteDesktopSpace.X - _lastOverlayRect.X, absoluteDesktopSpace.Y - _lastOverlayRect.Y);
+        Vector2 viewportPos = ImGui.GetMainViewport().Pos;
+        return new Vector2(
+            absoluteDesktopSpace.X - _lastOverlayRect.X + viewportPos.X,
+            absoluteDesktopSpace.Y - _lastOverlayRect.Y + viewportPos.Y);
     }
 
     private readonly record struct ProcessItem(string WindowTitle, string ProcessName, IntPtr Handle);
