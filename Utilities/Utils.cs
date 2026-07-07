@@ -314,6 +314,7 @@ public class Settings
 {
 	public string LastProcessName { get; set; } = string.Empty;
 	public bool LastUseWrapperMode { get; set; }
+	public bool TroubleshootingDiagnostics { get; set; }
 
 	public bool FirstRun { get; set; } = true;
 
@@ -371,5 +372,6 @@ public class Settings
 	{
 		Setting = new();
 		Setting.SaveSettings();
+		Setting = Settings.LoadSettings();
 	}
 }
