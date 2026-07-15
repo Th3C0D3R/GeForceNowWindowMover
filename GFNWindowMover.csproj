@@ -16,6 +16,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Remove="GFNWindowMover.Tests\**\*.cs" />
+		<EmbeddedResource Remove="GFNWindowMover.Tests\**\*" />
+		<None Remove="GFNWindowMover.Tests\**\*" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="ClickableTransparentOverlay" Version="11.1.0" />
 		<PackageReference Include="ImGui.NET" Version="1.91.6.1" />
 		<PackageReference Include="Microsoft.NETCore.App" Version="2.2.8" />

@@ -1,0 +1,43 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected.
+      placeholder: Steps, expected behavior, actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: e.g. Windows 11 24H2
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Optional but helpful for diagnosis.

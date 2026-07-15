@@ -1,7 +1,7 @@
 # GeForceNow WindowMover
-[![GitHub tag](https://img.shields.io/github/tag/TH3C0D3R/GeForceNowWindowMover?style=flat-square&include_prereleases=&sort=semver&color=blue)](https://github.com/TH3C0D3R/GeForceNowWindowMover/releases/)
+[![GitHub tag](https://img.shields.io/github/v/tag/TH3C0D3R/GeForceNowWindowMover?style=flat-square&include_prereleases=&sort=semver&color=blue)](https://github.com/TH3C0D3R/GeForceNowWindowMover/releases/)
 ![OS - windows](https://img.shields.io/badge/OS-windows-2ea44f?logo=windows&logoColor=%230078D6)
-[![Build status](https://ci.appveyor.com/api/projects/status/rlok08jsyvfrs4or/branch/main?svg=true&style=flat-square)](https://ci.appveyor.com/project/Th3C0D3R/geforcenowwindowmover/branch/main)
+[![CI](https://github.com/Th3C0D3R/GeForceNowWindowMover/actions/workflows/ci.yml/badge.svg)](https://github.com/Th3C0D3R/GeForceNowWindowMover/actions/workflows/ci.yml)
 [![GitHub issues](https://img.shields.io/github/issues/Th3C0D3R/GeForceNowWindowMover?style=flat-square)](https://github.com/Th3C0D3R/GeForceNowWindowMover/issues)
 [![GitHub license](https://img.shields.io/github/license/Th3C0D3R/GeForceNowWindowMover?style=flat-square)](https://github.com/Th3C0D3R/GeForceNowWindowMover/blob/main/LICENSE)
 
@@ -34,6 +34,15 @@ GFN WindowMover is a Windows tool to lock a target window to a defined area. It 
 ### Prerequisites
 - Windows
 - .NET 9 SDK (matching `net9.0-windows10.0.26100.0`)
+## Install (recommended)
+1. Open the [latest release](https://github.com/Th3C0D3R/GeForceNowWindowMover/releases/latest).
+2. Download the Windows executable artifact.
+3. Run `GFNWindowMover.exe`.
+
+## Build from source (developer)
+### Prerequisites
+- Windows
+- .NET 9 SDK
 - Visual Studio 2022 or `dotnet` CLI
 - Docker Desktop with **Windows containers** enabled (only for container workflow)
 
@@ -77,6 +86,11 @@ This repository targets Windows desktop APIs, so the Docker image is Windows-bas
   ```powershell
   dotnet build .\GFNWindowMover.csproj -c Release
   ```
+## Compatibility and troubleshooting
+- Target platform: Windows 10/11.
+- Run the app with normal user rights first; if the target process runs elevated, start this app elevated as well.
+- If process detection fails, use **Refresh Process** after the target window is visible.
+- If window locking behaves unexpectedly, disable and re-enable locking in the main window.
 
 ## Screenshots
 ### Fixed mode example
@@ -92,11 +106,7 @@ This repository targets Windows desktop APIs, so the Docker image is Windows-bas
 ![Docked Wrapper Example](https://raw.githubusercontent.com/Th3C0D3R/GeForceNowWindowMover/main/image4.png)
 
 ## Contributions
-Contributions are welcome.
-1. Fork the repository.
-2. Create a branch for your change.
-3. Keep changes focused and test locally.
-4. Open a Pull Request with a clear description of what changed and why.
+Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before opening a pull request.
 
 ## Issues
 If you found a bug or want to request a feature, please create an issue:
@@ -106,6 +116,9 @@ If you found a bug or want to request a feature, please create an issue:
 - Include OS/version and app version
 
 Issue tracker: https://github.com/Th3C0D3R/GeForceNowWindowMover/issues
+
+## Changelog
+Project history and release notes are documented in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Support
 If you want to support this project:

@@ -30,6 +30,9 @@ public static class UI
     private static Rect _lastAppliedRect = new(0, 0, 0, 0);
     private static IntPtr _lastAppliedHandle = IntPtr.Zero;
     private static Rect _lastOverlayRect = new(0, 0, 0, 0);
+    private static Vector2 _lastWrapperCursorScreenPos = Vector2.Zero;
+    private static bool _troubleshootingDiagnosticsEnabled;
+    private static long _nextDiagnosticsTick;
 
     public static bool OpenFixedEditorOnStart { get; set; }
 
@@ -53,6 +56,7 @@ public static class UI
 
         _showFixedEditor = Setting.FirstRun || OpenFixedEditorOnStart;
         _showWrapperWindow = ActiveMode == RunMode.Wrapper;
+        _troubleshootingDiagnosticsEnabled = Setting.TroubleshootingDiagnostics;
         _initialized = true;
     }
 
@@ -64,21 +68,26 @@ public static class UI
         }
 
         var virtualScreen = SystemInformation.VirtualScreen;
-        var targetRect = new Rect(virtualScreen.X, virtualScreen.Y, virtualScreen.Width, virtualScreen.Height);
-        if (_lastOverlayRect == targetRect)
+        var desiredRect = new Rect(virtualScreen.X, virtualScreen.Y, virtualScreen.Width, virtualScreen.Height);
+
+        if (!TryGetOverlayRect(out Rect currentOverlayRect) || currentOverlayRect != desiredRect)
         {
-            return;
+            OverlayInstance.Position = new System.Drawing.Point(desiredRect.X, desiredRect.Y);
+            OverlayInstance.Size = new System.Drawing.Size(desiredRect.Width, desiredRect.Height);
         }
 
-        OverlayInstance.Position = new System.Drawing.Point(targetRect.X, targetRect.Y);
-        OverlayInstance.Size = new System.Drawing.Size(targetRect.Width, targetRect.Height);
-        _lastOverlayRect = targetRect;
+        if (!TryGetOverlayRect(out _lastOverlayRect))
+        {
+            _lastOverlayRect = desiredRect;
+        }
     }
 
     private static void DrawControlWindow()
     {
+        SetSafeInitialControlWindowPosition();
         ImGui.SetNextWindowSize(new Vector2(640, 350), ImGuiCond.FirstUseEver);
         ImGui.Begin("GFN WindowMover", ImGuiWindowFlags.MenuBar);
+        ClampCurrentWindowIntoVisibleDesktop();
 
         if (ImGui.BeginMenuBar())
         {
@@ -103,7 +112,17 @@ public static class UI
                     LoadSettingsIntoRuntimeState();
                     _showFixedEditor = true;
                     _showWrapperWindow = false;
+                    _troubleshootingDiagnosticsEnabled = Setting.TroubleshootingDiagnostics;
                     _statusMessage = "Settings reset.";
+                }
+                if (ImGui.MenuItem("Troubleshooting Diagnostics", string.Empty, _troubleshootingDiagnosticsEnabled))
+                {
+                    _troubleshootingDiagnosticsEnabled = !_troubleshootingDiagnosticsEnabled;
+                    Setting.TroubleshootingDiagnostics = _troubleshootingDiagnosticsEnabled;
+                    Setting.SaveSettings();
+                    _statusMessage = _troubleshootingDiagnosticsEnabled
+                        ? "Troubleshooting diagnostics enabled."
+                        : "Troubleshooting diagnostics disabled.";
                 }
                 ImGui.EndMenu();
             }
@@ -244,6 +263,7 @@ public static class UI
             ImGui.End();
             return;
         }
+        ClampCurrentWindowIntoVisibleDesktop();
 
         ImGui.Text("Move and resize this window to the target region.");
         if (ImGui.Button("Save Region (keeps this window open)"))
@@ -307,9 +327,11 @@ public static class UI
             ImGui.End();
             return;
         }
+        ClampCurrentWindowIntoVisibleDesktop();
 
         ImGui.Text("The selected process is continuously moved into the inner area below.");
         Vector2 innerPos = ImGui.GetCursorScreenPos();
+        _lastWrapperCursorScreenPos = innerPos;
         Vector2 innerSize = ImGui.GetContentRegionAvail();
         if (innerSize.X > 20 && innerSize.Y > 20)
         {
@@ -352,10 +374,14 @@ public static class UI
                     targetRect = _wrapperInnerRect;
                     break;
                 }
+                EmitTroubleshootingDiagnostics(null);
                 return;
             default:
+                EmitTroubleshootingDiagnostics(null);
                 return;
         }
+
+        EmitTroubleshootingDiagnostics(targetRect);
 
         IntPtr handle = target.MainWindowHandle;
         if (targetRect.Width <= 0 || targetRect.Height <= 0 || handle == IntPtr.Zero)
@@ -479,14 +505,110 @@ public static class UI
         Setting.SaveSettings();
     }
 
+    private static void SetSafeInitialControlWindowPosition()
+    {
+        if (_lastOverlayRect.Width <= 0 || _lastOverlayRect.Height <= 0)
+        {
+            return;
+        }
+
+        const int margin = 40;
+        var safeAbsolutePos = new Vector2(_lastOverlayRect.X + margin, _lastOverlayRect.Y + margin);
+        ImGui.SetNextWindowPos(ToOverlaySpace(safeAbsolutePos), ImGuiCond.FirstUseEver);
+    }
+
+    private static void ClampCurrentWindowIntoVisibleDesktop()
+    {
+        if (_lastOverlayRect.Width <= 0 || _lastOverlayRect.Height <= 0)
+        {
+            return;
+        }
+
+        Vector2 windowSize = ImGui.GetWindowSize();
+        if (windowSize.X <= 0 || windowSize.Y <= 0)
+        {
+            return;
+        }
+
+        Vector2 absolutePos = ToAbsoluteDesktopSpace(ImGui.GetWindowPos());
+
+        float minX = _lastOverlayRect.X;
+        float minY = _lastOverlayRect.Y;
+        float maxX = Math.Max(minX, _lastOverlayRect.X + _lastOverlayRect.Width - windowSize.X);
+        float maxY = Math.Max(minY, _lastOverlayRect.Y + _lastOverlayRect.Height - windowSize.Y);
+
+        float clampedX = Math.Clamp(absolutePos.X, minX, maxX);
+        float clampedY = Math.Clamp(absolutePos.Y, minY, maxY);
+        if (Math.Abs(clampedX - absolutePos.X) < 0.5f && Math.Abs(clampedY - absolutePos.Y) < 0.5f)
+        {
+            return;
+        }
+
+        ImGui.SetWindowPos(ToOverlaySpace(new Vector2(clampedX, clampedY)), ImGuiCond.Always);
+    }
+
     private static Vector2 ToAbsoluteDesktopSpace(Vector2 overlaySpace)
     {
-        return new Vector2(overlaySpace.X + _lastOverlayRect.X, overlaySpace.Y + _lastOverlayRect.Y);
+        Vector2 viewportPos = ImGui.GetMainViewport().Pos;
+        return new Vector2(
+            overlaySpace.X - viewportPos.X + _lastOverlayRect.X,
+            overlaySpace.Y - viewportPos.Y + _lastOverlayRect.Y);
     }
 
     private static Vector2 ToOverlaySpace(Vector2 absoluteDesktopSpace)
     {
-        return new Vector2(absoluteDesktopSpace.X - _lastOverlayRect.X, absoluteDesktopSpace.Y - _lastOverlayRect.Y);
+        Vector2 viewportPos = ImGui.GetMainViewport().Pos;
+        return new Vector2(
+            absoluteDesktopSpace.X - _lastOverlayRect.X + viewportPos.X,
+            absoluteDesktopSpace.Y - _lastOverlayRect.Y + viewportPos.Y);
+    }
+
+    private static bool TryGetOverlayRect(out Rect rect)
+    {
+        if (OverlayInstance == null)
+        {
+            rect = new Rect(0, 0, 0, 0);
+            return false;
+        }
+
+        var position = OverlayInstance.Position;
+        var size = OverlayInstance.Size;
+        rect = new Rect(position.X, position.Y, size.Width, size.Height);
+        return size.Width > 0 && size.Height > 0;
+    }
+
+    private static void EmitTroubleshootingDiagnostics(Rect? targetRect)
+    {
+        if (!_troubleshootingDiagnosticsEnabled)
+        {
+            return;
+        }
+
+        long now = Stopwatch.GetTimestamp();
+        if (now < _nextDiagnosticsTick)
+        {
+            return;
+        }
+
+        _nextDiagnosticsTick = now + Stopwatch.Frequency;
+        var virtualScreen = SystemInformation.VirtualScreen;
+        Vector2 viewportPos = ImGui.GetMainViewport().Pos;
+        Vector2 viewportSize = ImGui.GetMainViewport().Size;
+        string screenBounds = string.Join(" | ", Screen.AllScreens.Select((screen, index) =>
+            $"{index}:{screen.Bounds.X},{screen.Bounds.Y},{screen.Bounds.Width}x{screen.Bounds.Height}"));
+        string targetText = targetRect is Rect r
+            ? $"{r.X},{r.Y},{r.Width}x{r.Height}"
+            : "<none>";
+
+        Utils.Log(
+            $"[diag] virtual={virtualScreen.X},{virtualScreen.Y},{virtualScreen.Width}x{virtualScreen.Height}; " +
+            $"screens={screenBounds}; " +
+            $"viewportPos={viewportPos.X:0.##},{viewportPos.Y:0.##}; viewportSize={viewportSize.X:0.##}x{viewportSize.Y:0.##}; " +
+            $"overlay={_lastOverlayRect.X},{_lastOverlayRect.Y},{_lastOverlayRect.Width}x{_lastOverlayRect.Height}; " +
+            $"wrapperCursor={_lastWrapperCursorScreenPos.X:0.##},{_lastWrapperCursorScreenPos.Y:0.##}; " +
+            $"wrapperInner={_wrapperInnerRect.X},{_wrapperInnerRect.Y},{_wrapperInnerRect.Width}x{_wrapperInnerRect.Height}; " +
+            $"targetRect={targetText}",
+            "Diagnostics");
     }
 
     private readonly record struct ProcessItem(string WindowTitle, string ProcessName, IntPtr Handle);
