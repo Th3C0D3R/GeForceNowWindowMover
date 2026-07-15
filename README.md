@@ -30,6 +30,10 @@ GFN WindowMover is a Windows tool to lock a target window to a defined area. It 
    - move/resize the wrapper window; the target is locked to the inner area
 7. Use **Disable** to temporarily stop locking and move the target window freely; use **Enable** to lock again.
 
+## Setup and development
+### Prerequisites
+- Windows
+- .NET 9 SDK (matching `net9.0-windows10.0.26100.0`)
 ## Install (recommended)
 1. Open the [latest release](https://github.com/Th3C0D3R/GeForceNowWindowMover/releases/latest).
 2. Download the Windows executable artifact.
@@ -40,6 +44,12 @@ GFN WindowMover is a Windows tool to lock a target window to a defined area. It 
 - Windows
 - .NET 9 SDK
 - Visual Studio 2022 or `dotnet` CLI
+- Docker Desktop with **Windows containers** enabled (only for container workflow)
+
+### Local setup
+```powershell
+dotnet restore .\GFNWindowMover.csproj
+```
 
 ### Build with Visual Studio
 1. Open `GeForceNowWindowMover.sln`
@@ -48,13 +58,34 @@ GFN WindowMover is a Windows tool to lock a target window to a defined area. It 
 
 ### Build with dotnet CLI
 ```powershell
-dotnet restore
 dotnet build .\GFNWindowMover.csproj -c Release
 ```
 
 Output binaries are placed in:
 `.\bin\Release\...`
 
+### Reproducible environment with Docker (Windows container)
+```powershell
+docker build -t gfn-window-mover:dev .
+```
+
+This repository targets Windows desktop APIs, so the Docker image is Windows-based and requires a Windows container host.
+
+### Code style
+- Follow repository rules in `.editorconfig`.
+- Keep changes consistent with existing naming and structure in `Program.cs`, `UI.cs`, and `Utilities\`.
+- Run formatter/lint tooling you already use in your IDE before opening a PR.
+
+### Tests
+- There is currently no dedicated automated test project in the solution.
+- When tests are added, run:
+  ```powershell
+  dotnet test .\GeForceNowWindowMover.sln -c Release
+  ```
+- For now, use build success as the primary validation signal:
+  ```powershell
+  dotnet build .\GFNWindowMover.csproj -c Release
+  ```
 ## Compatibility and troubleshooting
 - Target platform: Windows 10/11.
 - Run the app with normal user rights first; if the target process runs elevated, start this app elevated as well.
