@@ -1,0 +1,45 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'   # triggers on tags like v1.0.0
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore .\GeForceNowWindowMover.sln
+
+      - name: Build
+        run: dotnet build .\GeForceNowWindowMover.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test .\GFNWindowMover.Tests\GFNWindowMover.Tests.csproj -c Release --no-build --verbosity normal
+
+      - name: Upload artifact (optional, for debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: bin/Release/net9.0-windows10.0.26100.0/*.*
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: bin/Release/net9.0-windows10.0.26100.0/*.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
