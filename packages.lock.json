@@ -62,9 +62,9 @@
       },
       "Vortice.Mathematics": {
         "type": "Direct",
-        "requested": "[1.9.3, )",
-        "resolved": "1.9.3",
-        "contentHash": "VzXWjzM4F5pK3gP3m0wv9LqhRrcmQebf+lK/gIPLZ+TPXTptMal74iGkQbivIJm9OwdMZdGOuk1dvwc2iJHUGQ=="
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "5hQRSeg4MnVwxVAPuvW49NbCmpJL1CD9q+OLoIPHzOlduQXQrqhdQ8L+RhFdgg1ifIUVjWyhNF2LhyyvAtivkQ=="
       },
       "Microsoft.DotNet.PlatformAbstractions": {
         "type": "Transitive",

@@ -28,7 +28,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
 		<PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
-		<PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
+		<PackageReference Include="Vortice.Mathematics" Version="2.1.1" />
 	</ItemGroup>
 
 </Project>
